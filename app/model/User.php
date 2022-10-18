@@ -7,60 +7,99 @@ use core\Model;
 class User extends Model
 {
 
-    public function addNewUser(array $data): void
+    public function addNewUser(array $data): object
     {
-        $registerDate = time();
+        if (!isset($data['status'])) {
+            $data['status'] = 'off';
+        }
         $params = [
-            'email' => htmlspecialchars(strtolower($data['email'])),
-            'login' => htmlspecialchars(strtolower($data['login'])),
             'name' => htmlspecialchars(strtolower($data['name'])),
-            'pass' => htmlspecialchars(md5($data['pass'])),
-            'birthday' => htmlspecialchars(strtolower($data['birthday'])),
-            'country' => htmlspecialchars(strtolower($data['country'])),
-            'date' => $registerDate
-        ];
-        $this->db->query(
-            "INSERT INTO users (email,login,name,pass,birthday,country,date) VALUES (:email,:login,:name,:pass,:birthday,:country,:date)", $params
-        );
-
-        // return newly created row
-        return;
-    }
-
-    public function getUser($email, $pass)
-    {
-        $params = [
-            'email' => htmlspecialchars(strtolower($email)),
-            'pass' => htmlspecialchars(md5($pass)),
+            'surname' => htmlspecialchars(strtolower($data['surname'])),
+            'role' => htmlspecialchars(strtolower($data['role'])),
+            'status' => htmlspecialchars(strtolower($data['status'])),
 
         ];
-        return $this->db->row("SELECT id, name, email FROM users WHERE email = :email AND pass = :pass OR login = :email AND pass = :pass", $params);
+        return $this->db->query("INSERT INTO users (name,surname,is_admin,status) VALUES (:name,:surname,:role,:status)", $params);
+
     }
+
 
     public function getAllUsers()
     {
-        return  $this->db->getAllRows('SELECT * FROM users');
-//            $this->db->getAllRows('SELECT * FROM users');
+        return $this->db->getAllRows('SELECT * FROM users');
 
     }
 
-    public function checkUniqueEmail($email)
+    public function editUser()
     {
+
+
+//        return $this->db->row('UPDATE')
+    }
+
+
+    public function deleteUsers($id): object
+    {
+
         $params = [
-            'email' => strtolower($email),
+            'id' => $id
         ];
 
-        return $this->db->row("SELECT email FROM users WHERE email = :email ", $params);
+
+        return $this->db->query("DELETE FROM users WHERE id = :id ", $params);
+
+
     }
 
-    public function checkUniqueLogin($login)
+    public function setActive($id): object
     {
         $params = [
-            'login' => strtolower($login),
+            'id' => $id
         ];
 
-        return $this->db->row("SELECT login FROM users WHERE login = :login ", $params);
+        return $this->db->query("UPDATE users SET status = 'on' WHERE id = :id ", $params);
+
     }
+
+
+    public function setNotActive($id): object
+    {
+        $params = [
+            'id' => $id
+        ];
+
+        return $this->db->query("UPDATE users SET status = 'off' WHERE id = :id ", $params);
+
+    }
+
+
+
+//    public function setActive($data)
+//    {
+//        $params = [
+//            'id' => $data['id']
+//        ];
+//        foreach ($data['id'] as $value){
+//
+//            $this->db->row("UPDATE users SET status = 'on' WHERE id = '$value' ",$params);
+//        }
+//        return true;
+//
+//    }
+
+//    public function setNotActive($data)
+//    {
+//        $params = [
+//            'id' => $data['id']
+//        ];
+//        foreach ($data['id'] as $value){
+//
+//            $this->db->row("UPDATE users SET status = 'off' WHERE id = '$value' ",$params);
+//        }
+//
+//    }
+
+
 }
 
 

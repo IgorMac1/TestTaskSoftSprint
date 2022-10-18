@@ -10,4 +10,19 @@ return [
         'action' => 'edit',
         'method' => 'PUT',
     ],
+
+    'user/:id' => [
+        'controller' => 'user',
+        'action' => 'delete',
+        'method' => 'POST',
+    ],
+
+    'setActive' => [
+        'controller' => 'user',
+        'action' => 'setActive',
+        'method' => 'POST',
+    ],
+
+
+
 ];

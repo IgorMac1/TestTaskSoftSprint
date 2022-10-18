@@ -56,6 +56,6 @@ class Router
             }
         }
 
-        header('Location: /') ;
+//        header('Location: /') ;
     }
 }

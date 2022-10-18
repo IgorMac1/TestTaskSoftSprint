@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
           integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
 <body>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
@@ -34,18 +35,18 @@
                                 </div>
 
                                 <div class=" col ">
-                                    <form>
-                                        <select name="select" form="" class="custom-select">
-                                            <option>Please Select</option>
-                                            <option>Set active</option>
-                                            <option>Set not active</option>
-                                            <option>Delete</option>
-                                        </select>
+
+                                    <select name="select" class="custom-select select">
+                                        <option>Please Select</option>
+                                        <option value="Set active">Set active</option>
+                                        <option value="Set not active">Set not active</option>
+                                        <option value="Delete">Delete</option>
+                                    </select>
                                 </div>
                                 <div class="col ">
 
-                                    <button type="button" class="btn btn-success">OK</button>
-                                    </form>
+                                    <button type="submit" class="btn btn-success ok">OK</button>
+
                                 </div>
 
 
@@ -58,7 +59,7 @@
                                             <th class="align-top">
                                                 <div
                                                         class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0">
-                                                    <input type="checkbox" class="custom-control-input" id="all-items">
+                                                    <input type="checkbox" class="custom-control-input " id="all-items">
                                                     <label class="custom-control-label" for="all-items"></label>
                                                 </div>
                                             </th>
@@ -69,12 +70,15 @@
                                         </tr>
                                         </thead>
                                         <tbody>
+                                        <!--                                        <form action="/user/:id" id="table_form" method="post">-->
+<!--                                        --><?php //dd($users); ?>
                                         <?php foreach ($users as $users): ?>
+                                        <div class="users" id="<?= $users['id'] ?>">
                                             <tr>
                                                 <td class="align-middle">
-                                                    <div
-                                                            class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0 align-top">
-                                                        <input type="checkbox" class="custom-control-input"
+                                                    <div class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0 align-top">
+                                                        <input type="checkbox" class="custom-control-input checkbox id"
+                                                               name="id" value="<?= $users['id'] ?>"
                                                                id="item-<?= $users['id'] ?>">
                                                         <label class="custom-control-label"
                                                                for="item-<?= $users['id'] ?>"></label>
@@ -85,24 +89,32 @@
                                                     <span><?php if ($users['is_admin'] == 2) {
                                                             echo "Admin";
                                                         } else echo "User" ?></span></td>
-                                                <td class="text-center align-middle"><i
-                                                            class="fa fa-circle active-circle"></i></td>
+                                                <td class="text-center align-middle">
+                                                    <?php if ($users['status'] === 'on') {
+
+                                                        echo '<i class="fa fa-circle active-circle"></i>';
+                                                    } else {
+                                                        echo '<i class="fa fa-circle not-active-circle"></i>';
+                                                    } ?> </td>
                                                 <td class="text-center align-middle">
                                                     <div class="btn-group align-top">
-                                                        <button class="btn btn-sm btn-outline-secondary badge"
-                                                                type="button" data-toggle="modal"
-                                                                data-target="#user-form-modal">Edit
+                                                        <button class="btn btn-sm btn-outline-secondary badge edit"
+                                                                type="submit" data-toggle="modal"
+                                                                data-target="#user-form-modal" id="<?= $users['id'] ?>" >Edit
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-secondary badge"
+                                                        <button class="btn btn-sm btn-outline-secondary badge deleteUser "
                                                                 data-target="#user-delete-modal"
                                                                 data-toggle="modal"
-                                                                id="deleteUser<?= $users->id ?>"
-                                                                type="button"><i class="fa fa-trash"></i></button>
+                                                                id="deleteUser"
+                                                                type="submit"><i class="fa fa-trash" ></i></button>
 
                                                     </div>
                                                 </td>
                                             </tr>
+                                        </div>
                                         <?php endforeach; ?>
+
+                                        <!--                                        </form>-->
                                         </tbody>
                                     </table>
                                 </div>
@@ -144,8 +156,8 @@
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="UserModalLabel">Add user</h5>
-                                <div id="errorMess" class="alert alert-danger" role="alert"></div>
+                                <h5 class="modal-title  " id="UserModalLabel">Add user</h5>
+
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -161,8 +173,9 @@
                                     <input required type="text" class="form-control" id="last-name" name="surname">
                                 </div>
                                 <div class="custom-control custom-switch my-5">
-                                    <input type="checkbox" class="custom-control-input" id="customSwitch1" name="status">
-                                    <label class="custom-control-label" for="customSwitch1" >Active</label>
+                                    <input type="checkbox" class="custom-control-input" id="customSwitch1"
+                                           name="status">
+                                    <label class="custom-control-label" for="customSwitch1">Active</label>
                                 </div>
                                 <select class="custom-select" id="role" name="role">
                                     <option selected>Role</option>
@@ -173,40 +186,66 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button id="addUserButton" type="submit" class="btn btn-primary" id="btn">Save</button>
+                                <button id="addUserButton" type="submit" class="btn btn-primary" >Save</button>
+                                <!--                                <button id="editUserButton" type="submit" class="btn btn-primary" id="btn" hidden >Edit</button>-->
                             </div>
 
                         </div>
                     </div>
                 </div>
             </form>
-
-            <div class="modal fade" id="user-delete-modal" tabindex="-1" aria-labelledby="user-form-modal"
-                 aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-body">
-
-                            <h2>Are you sure you want to delete this user?</h2>
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button id="deleteUserButton" type="submit" class="btn btn-primary" id="btn">Delete</button>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
+<!---->
+<!--            <div class="modal fade" id="user-delete-modal" tabindex="-1" aria-labelledby="user-form-modal"-->
+<!--                 aria-hidden="true">-->
+<!--                <div class="modal-dialog">-->
+<!--                    <div class="modal-content">-->
+<!--                        <div class="modal-body">-->
+<!---->
+<!--                            <h2>Are you sure you want to delete this user ?</h2>-->
+<!---->
+<!--                        </div>-->
+<!--                        <div class="modal-footer">-->
+<!--                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+<!--                            <button id="deleteUserButton" type="submit" class="btn btn-primary" id="btn">Delete</button>-->
+<!--                        </div>-->
+<!---->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
 
         </div>
     </div>
-    <script>
+
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" id="warningModal"
+            hidden>
+
+    </button>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body warning" id="warning">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="confirmDelete" hidden>Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
-
-    </script>
     <script src="./js/addUser.js"></script>
 
 </body>
