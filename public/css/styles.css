@@ -2,10 +2,10 @@ body{
   margin-top:20px;
   background:#f8f8f8
 }
-.active-circle {
+.on-circle {
   color: green;
 }
-.not-active-circle {
+.off-circle {
   color: red;
 }
 

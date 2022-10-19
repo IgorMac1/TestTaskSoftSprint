@@ -1,28 +1,33 @@
 <?php
 return [
-    'users' => [
+    [
+        'path' => 'users',
         'controller' => 'user',
         'action' => 'add',
         'method' => 'POST',
     ],
-    'users/:id' => [
+    [
+        'path' => 'users/:id',
         'controller' => 'user',
         'action' => 'edit',
         'method' => 'PUT',
     ],
-
-    'user/:id' => [
+    [
+        'path' => 'users/:id',
         'controller' => 'user',
-        'action' => 'delete',
+        'action' => 'deleteUser',
+        'method' => 'DELETE',
+    ],
+    [
+        'path' => 'users/delete',
+        'controller' => 'user',
+        'action' => 'deleteUsers',
+        'method' => 'DELETE',
+    ],
+    [
+        'path' => 'users/change-status',
+        'controller' => 'user',
+        'action' => 'changeStatus',
         'method' => 'POST',
     ],
-
-    'setActive' => [
-        'controller' => 'user',
-        'action' => 'setActive',
-        'method' => 'POST',
-    ],
-
-
-
 ];

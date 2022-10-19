@@ -28,7 +28,8 @@
                             <div class="row cols-row-lg-3 text-center">
                                 <div class="col ">
                                     <form>
-                                        <button type="button" class="btn btn-primary" data-target="#user-form-modal"
+                                        <button type="button" class="btn btn-primary addUser"
+                                                data-target="#user-form-modal"
                                                 data-toggle="modal">Add
                                         </button>
                                     </form>
@@ -36,16 +37,16 @@
 
                                 <div class=" col ">
 
-                                    <select name="select" class="custom-select select">
-                                        <option>Please Select</option>
-                                        <option value="Set active">Set active</option>
-                                        <option value="Set not active">Set not active</option>
-                                        <option value="Delete">Delete</option>
+                                    <select name="select" class="custom-select select select-action top">
+                                        <option value="" disabled selected hidden>Please Select</option>
+                                        <option value="active">Set active</option>
+                                        <option value="inactive">Set not active</option>
+                                        <option value="delete">Delete</option>
                                     </select>
                                 </div>
                                 <div class="col ">
 
-                                    <button type="submit" class="btn btn-success ok">OK</button>
+                                    <button type="submit" class="btn btn-success ok top">OK</button>
 
                                 </div>
 
@@ -57,8 +58,7 @@
                                         <thead>
                                         <tr>
                                             <th class="align-top">
-                                                <div
-                                                        class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0">
+                                                <div class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0">
                                                     <input type="checkbox" class="custom-control-input " id="all-items">
                                                     <label class="custom-control-label" for="all-items"></label>
                                                 </div>
@@ -69,57 +69,49 @@
                                             <th>Actions</th>
                                         </tr>
                                         </thead>
-                                        <tbody>
-                                        <!--                                        <form action="/user/:id" id="table_form" method="post">-->
-<!--                                        --><?php //dd($users); ?>
+
+                                        <tbody id="table-users">
+
                                         <?php foreach ($users as $users): ?>
-                                        <div class="users" id="<?= $users['id'] ?>">
-                                            <tr>
-                                                <td class="align-middle">
+
+                                            <tr class="user" id="<?= $users['id'] ?>">
+                                                <td dataField="name" dataValue="<?= $users['name'] ?>" class="align-middle">
                                                     <div class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0 align-top">
-                                                        <input type="checkbox" class="custom-control-input checkbox id"
+                                                        <input type="checkbox" class="custom-control-input checkbox id td-checkbox"
                                                                name="id" value="<?= $users['id'] ?>"
                                                                id="item-<?= $users['id'] ?>">
                                                         <label class="custom-control-label"
                                                                for="item-<?= $users['id'] ?>"></label>
                                                     </div>
                                                 </td>
-                                                <td class="text-nowrap align-middle"><?= ucfirst($users['name']) . ' ' . ucfirst($users['surname']) ?></td>
-                                                <td class="text-nowrap align-middle">
-                                                    <span><?php if ($users['is_admin'] == 2) {
-                                                            echo "Admin";
-                                                        } else echo "User" ?></span></td>
-                                                <td class="text-center align-middle">
-                                                    <?php if ($users['status'] === 'on') {
-
-                                                        echo '<i class="fa fa-circle active-circle"></i>';
-                                                    } else {
-                                                        echo '<i class="fa fa-circle not-active-circle"></i>';
-                                                    } ?> </td>
+                                                <td dataField="surname" dataValue="<?= $users['surname'] ?>" class="text-nowrap align-middle"><?= $users['full_name'] ?></td>
+                                                <td dataField="role_id" dataValue="<?= $users['role_id'] ?>" class="text-nowrap align-middle">
+                                                    <span><?= $users['role'] ?></span></td>
+                                                <td dataField="status" dataValue="<?= $users['status'] ?>" class="user-status text-center align-middle">
+                                                    <i class="fa fa-circle <?php echo $users['status'] ?>-circle"></i>
+                                                </td>
                                                 <td class="text-center align-middle">
                                                     <div class="btn-group align-top">
-                                                        <button class="btn btn-sm btn-outline-secondary badge edit"
-                                                                type="submit" data-toggle="modal"
-                                                                data-target="#user-form-modal" id="<?= $users['id'] ?>" >Edit
+                                                        <button class="btn btn-sm btn-outline-secondary badge editUser"
+                                                                type="submit"  data-target="#user-form-modal"
+                                                                data-toggle="modal" id="<?= $users['id'] ?>" >Edit
                                                         </button>
                                                         <button class="btn btn-sm btn-outline-secondary badge deleteUser "
                                                                 data-target="#user-delete-modal"
                                                                 data-toggle="modal"
-                                                                id="deleteUser"
+                                                                id="<?= $users['id'] ?>"
                                                                 type="submit"><i class="fa fa-trash" ></i></button>
 
                                                     </div>
                                                 </td>
                                             </tr>
-                                        </div>
-                                        <?php endforeach; ?>
 
-                                        <!--                                        </form>-->
+                                        <?php endforeach; ?>
                                         </tbody>
+
                                     </table>
                                 </div>
                             </div>
-
 
                             <div class="row cols-row-lg-3 text-center">
                                 <div class="col">
@@ -130,16 +122,16 @@
                                     </form>
                                 </div>
                                 <div class=" col">
-                                    <select name="select" form="" class="custom-select">
-                                        <option>Please Select</option>
-                                        <option>Set active</option>
-                                        <option>Set not active</option>
-                                        <option>Delete</option>
+                                    <select name="select" form="" class="custom-select select-action bottom">
+                                        <option value="" disabled selected hidden>Please Select</option>
+                                        <option value="active">Set active</option>
+                                        <option value="inactive">Set not active</option>
+                                        <option value="delete">Delete</option>
                                     </select>
                                 </div>
                                 <div class="col">
                                     <form>
-                                        <button type="button" class="btn btn-success">OK</button>
+                                        <button type="button" class="btn btn-success ok bottom">OK</button>
                                     </form>
                                 </div>
 
@@ -156,7 +148,7 @@
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title  " id="UserModalLabel">Add user</h5>
+                                <h5 class="modal-title" id="UserModalLabel">Add user</h5>
 
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
@@ -177,8 +169,8 @@
                                            name="status">
                                     <label class="custom-control-label" for="customSwitch1">Active</label>
                                 </div>
-                                <select class="custom-select" id="role" name="role">
-                                    <option selected>Role</option>
+                                <select class="custom-select" id="role" name="role_id">
+                                    <option value="" disabled selected hidden>Role</option>
                                     <option value="1">User</option>
                                     <option value="2">Admin</option>
                                 </select>
@@ -186,43 +178,23 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button id="addUserButton" type="submit" class="btn btn-primary" >Save</button>
-                                <!--                                <button id="editUserButton" type="submit" class="btn btn-primary" id="btn" hidden >Edit</button>-->
+                                <button type="submit" class="btn btn-primary submit-button" >Save</button>
                             </div>
 
                         </div>
                     </div>
                 </div>
             </form>
-<!---->
-<!--            <div class="modal fade" id="user-delete-modal" tabindex="-1" aria-labelledby="user-form-modal"-->
-<!--                 aria-hidden="true">-->
-<!--                <div class="modal-dialog">-->
-<!--                    <div class="modal-content">-->
-<!--                        <div class="modal-body">-->
-<!---->
-<!--                            <h2>Are you sure you want to delete this user ?</h2>-->
-<!---->
-<!--                        </div>-->
-<!--                        <div class="modal-footer">-->
-<!--                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
-<!--                            <button id="deleteUserButton" type="submit" class="btn btn-primary" id="btn">Delete</button>-->
-<!--                        </div>-->
-<!---->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
 
         </div>
     </div>
 
 
     <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" id="warningModal"
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#deleteModal" id="warningModal"
             hidden>
-
     </button>
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

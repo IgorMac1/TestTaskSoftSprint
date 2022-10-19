@@ -17,6 +17,7 @@ class ApiResponse
         ], $responseData);
 
         echo json_encode($response);
+        die();
     }
 
 }

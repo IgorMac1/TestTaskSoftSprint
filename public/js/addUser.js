@@ -1,112 +1,256 @@
-
-const warningText = document.getElementById('warning');
-
 $(function () {
+    const warningText = document.getElementById('warning');
 
     $('form#ajax_form').submit(function (event) {
-        let formData = $(this).serializeArray();
+        let formData = parseFormData($(this).serializeArray());
         event.preventDefault();
-        addUser(formData);
+        if (!formData.role_id){
+            warningText.innerText = 'choose role';
+            document.getElementById('confirmDelete').hidden = true ;
+            document.getElementById('warningModal').click();
+            return false
+        }
+        let id = $('form#ajax_form .submit-button').attr('id');
+        if (id) {
+            editUser(id, formData);
+        } else {
+            addUser(formData);
+        }
+
         $('#user-form-modal').modal('hide')
     });
 
-    function addUser(formData) {
+    function parseFormData(formData) {
         let userData = {};
         $.each(formData, function (i, field) {
             userData[field.name] = field.value;
         });
-        console.log(userData);
-        $.ajax({
-            url: "/api/users",
-            type: 'POST',
-            data: userData,
-            success: function (result) {
-                console.log('success');
-                console.log(result);
-            },
-            error: function (result) {
-                console.log('error');
-                console.log(result);
-            }
-        });
+        if (!userData.status) {
+            userData.status = 'off';
+        }
+        return userData;
     }
-})
 
-$(document).ready(function (){
+    function addUser(userData) {
+        sendRequest(
+            '/api/users',
+            userData,
+            function (result) {
+                $userRow = getUserRow(result.user);
+                $('#table-users').append($userRow);
+                initializeButtonAction();
+            });
+    }
+
+    function editUser(userId, userData) {
+        sendRequest(
+            '/api/users/' + userId,
+            userData,
+            function (result) {
+                $userRow = getUserRow(result.user);
+                $('tr#' + userId).replaceWith($userRow);
+                initializeButtonAction();
+            }, function () {
+
+            }, 'PUT');
+    }
+
     $('button.ok').on('click',function (){
         let checkboxes = [];
         let userData = {};
 
         $('input:checkbox:checked').each(function(){
             checkboxes.push(this.value);
-
-
         });
-        let selected = $('select.select').val();
-        if (selected === 'Please Select'){
-            warningText.innerText = 'choose action';
-            document.getElementById('confirmDelete').hidden = true ;
-            document.getElementById('warningModal').click();
-            console.log(warningText)
-            return false;
-        }else if (selected !== 'Please Select' && checkboxes.length === 0 ){
+        let selectedAction = $('select.select-action.top').val();
+        if ($(this).hasClass('bottom')) {
+            selectedAction = $('select.select-action.bottom').val();
+        }
+
+        if (checkboxes.length === 0) {
             document.getElementById('confirmDelete').hidden = true ;
             document.getElementById('warningModal').click();
             warningText.innerText = 'choose users';
-            return false;
+            return;
         }
-        else if (checkboxes.length !== 0 && selected === 'Delete' ){
-            document.getElementById('deleteUser').click();
+        switch (selectedAction) {
+            case 'active':
+            case 'inactive': {
+                setUserStatus(selectedAction);
+                break;
+            }
+            case 'delete': {
+                deleteUsers();
+                break;
+            }
+            case null: {
+                warningText.innerText = 'choose action';
+                document.getElementById('confirmDelete').hidden = true ;
+                document.getElementById('warningModal').click();
+                console.log(warningText);
+                break;
+            }
+        }
+
+        function deleteUsers() {
+            warningText.innerText = 'Are you sure you want to delete these users ?' ;
+            $('#confirmDelete').attr('hidden', false);
+            $('#warningModal').click();
             $('button#confirmDelete').on('click',function (){
-                getUserAction();
-                // for (let key in checkboxes){
-                //   let i = checkboxes[key];
-                //
-                //     document.getElementById(`${i}`).remove()
-                // }
-                $('#exampleModal').modal('hide');
-            })
-
-        }else getUserAction();
-        function getUserAction() {
-
-
-            userData["action"] = selected;
-            userData["id"] = checkboxes;
-
-            console.log(userData)
-
-            $.ajax({
-                url: "/api/setActive",
-                type: 'POST',
-                data: userData,
-                success: function (result) {
-                    console.log('success');
-                    console.log(result);
+                userData['ids'] = checkboxes;
+                sendRequest(
+                    '/api/users/delete',
+                    userData,
+                    function () {
+                        for (let id in checkboxes) {
+                            let userRow = $('tr#' + checkboxes[id]);
+                            userRow.remove();
+                        }
+                    },
+                    function () {
+                    },
+                    'DELETE');
+                $('#deleteModal').modal('hide');
+            });
+        }
+        function setUserStatus (status) {
+            userData['status'] = status;
+            userData['ids'] = checkboxes;
+            sendRequest(
+                '/api/users/change-status',
+                userData,
+                function () {
+                    let userIconStatus = status === 'active' ? 'on' : 'off';
+                    for (let id in checkboxes) {
+                        let statusBlock = $('tr#' + checkboxes[id] + ' td.user-status');
+                        statusBlock.empty().append('<i class="fa fa-circle ' + userIconStatus + '-circle"></i>');
+                    }
                 },
-                error: function (result) {
-                    console.log('error');
-                    console.log(result);
-                }
+                function () {
             });
         }
     })
+
+    function initializeButtonAction() {
+        $('button.deleteUser').on('click',function () {
+            warningText.innerText = 'Are you sure you want to delete this user ?' ;
+            $('#confirmDelete').attr('hidden', false);
+            $('#warningModal').click();
+            let userId = $(this).attr('id');
+            $('button#confirmDelete').on('click',function (){
+                sendRequest(
+                    '/api/users/' + userId,
+                    {},
+                    function () {
+                        $('tr#' + userId).remove();
+                    },
+                    function () {
+                    },
+                    'DELETE');
+                $('#deleteModal').modal('hide');
+            })
+        });
+        $('button.editUser').on('click',function () {
+            let id = $(this).attr('id');
+            $('form#ajax_form .submit-button').attr('id', id);
+            $('h5.modal-title').text('Edit User');
+            $('tr#' + id).find('td').each(function () {
+                if ($(this).attr('dataField')) {
+                    let fieldName = $(this).attr('dataField');
+                    let fieldValue = $(this).attr('dataValue');
+                    if (fieldName === 'status') {
+                        $('form#ajax_form [name="' + fieldName + '"]').prop('checked', (fieldValue === 'on'));
+                    } else {
+                        $('form#ajax_form [name="' + fieldName + '"]').val(fieldValue);
+                    }
+                }
+            });
+        });
+        $('button.addUser').on('click',function () {
+            $('form#ajax_form .submit-button').attr('id', '');
+            $('h5.modal-title').text('Add User');
+            $('form#ajax_form')[0].reset();
+        });
+        $('#all-items').on('change', function() {
+            if(this.checked) {
+                $('.td-checkbox').each(function () {
+                    $(this).prop('checked', 'checked');
+                });
+            } else {
+                $('.td-checkbox').each(function () {
+                    $(this).prop('checked', false);
+                });
+            }
+        });
+        $('.td-checkbox').on('change', function() {
+            if(!this.checked) {
+                $('#all-items').prop('checked', false);
+            } else {
+                let allChecked = true;
+                $('.td-checkbox').each(function () {
+                    if(!this.checked) {
+                        allChecked = false;
+                    }
+                });
+                if(allChecked) {
+                    $('#all-items').prop('checked', 'checked');
+                }
+            }
+        });
+    }
+    initializeButtonAction();
+
+    function sendRequest(url, data, onSuccess, onError, method = 'POST') {
+        $.ajax({
+            url: url,
+            type: method,
+            data: data,
+            success: function (result) {
+                onSuccess(result);
+            },
+            error: function (result) {
+                console.log('error');
+                console.log(result);
+                onError(result);
+            }
+        });
+    }
+
+    function getUserRow(userData){
+        return `
+        <tr class="user" id="${userData.id}">
+            <td class="align-middle">
+                <div class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0 align-top">
+                    <input type="checkbox" class="custom-control-input checkbox id"
+                           name="id" value="${userData.id}"
+                           id="item-${userData.id}">
+                    <label class="custom-control-label"
+                           for="item-${userData.id}"></label>
+                </div>
+            </td>
+            <td class="text-nowrap align-middle">${userData.name}</td>
+            <td class="text-nowrap align-middle">
+                <span>${userData.role}</span></td>
+            <td class="user-status text-center align-middle">
+                <i class="fa fa-circle ${userData.status}-circle"></i>
+            </td>
+            <td class="text-center align-middle">
+                <div class="btn-group align-top">
+                    <button class="btn btn-sm btn-outline-secondary badge edit"
+                            type="submit" data-toggle="modal"
+                            data-target="#user-form-modal" id="${userData.id}" >Edit
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary badge deleteUser "
+                            data-target="#user-delete-modal"
+                            data-toggle="modal"
+                            id="${userData.id}"
+                            type="submit"><i class="fa fa-trash" ></i></button>
+
+                </div>
+            </td>
+        </tr>`
+    }
 })
-
-$(document).ready(function (){
-    $('button.deleteUser').on('click',function (){
-        warningText.innerText = 'Are you sure you want to delete this user ?' ;
-        document.getElementById('confirmDelete').hidden = false ;
-        document.getElementById('warningModal').click();
-
-        $('button#confirmDelete').on('click',function (){
-            console.log($(this).id)
-            $('#exampleModal').modal('hide');
-        })
-    })
-})
-
-
 
 
 

@@ -11,29 +11,31 @@ class Router
     {
         if (strpos($_SERVER['REQUEST_URI'], '/api/') === 0) {
             $routes = require 'config/routes/api.php';
-            foreach ($routes as $key => $val) {
-                $this->add('api/' . $key, $val);
+            foreach ($routes as $key => $route) {
+                $route['path'] = 'api/' . $route['path'];
+                $this->add($route);
             }
-            // check request method
         } else {
             $routes = require 'config/routes/web.php';
-            foreach ($routes as $key => $val) {
-                $this->add($key, $val);
+            foreach ($routes as $val) {
+                $this->add($val);
             }
         }
     }
 
-    public function add($route, $params)
+    public function add($params)
     {
-        $route = '#^' . $route . '$#';
-        $this->routes[$route] = $params;
+        $params['path'] = '#^' . $params['path'] . '$#';
+        $this->routes[] = $params;
     }
 
     public function match()
     {
         $url = trim($_SERVER['REQUEST_URI'], '/');
-        foreach ($this->routes as $route => $params) {
-            if (preg_match($route, $url, $matches)) {
+        $url = preg_replace('/\d+/', ':id', $url);
+        $requestMethod = $_SERVER['REQUEST_METHOD'];
+        foreach ($this->routes as $params) {
+            if (preg_match($params['path'], $url, $matches) && $requestMethod === $params['method']) {
                 $this->params = $params;
                 return true;
             }

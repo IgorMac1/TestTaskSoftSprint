@@ -17,50 +17,68 @@ class UserController extends Controller
 
     public function addAction()
     {
-
-
-
-        $newUser = $this->model->addNewUser($_POST);
+        $newUser = $this->model->addNewUser();
 
         if ($newUser) {
-            ApiResponse::response(200, ['user' => ['name'=>$_POST['name'],'surname'=>$_POST['surname'],'status'=>$_POST['status']]]);
-
+            ApiResponse::response(200, ['user' => $newUser]);
         } else {
-            ApiResponse::response(417, [], 'form validation failed');
+            ApiResponse::response(417, [], 'DB error');
         }
     }
 
 
     public function editAction()
     {
+        $user = $this->model->editUser();
 
+        if ($user) {
+            ApiResponse::response(200, ['user' => $user]);
+        } else {
+            ApiResponse::response(404, [], 'User Not Found');
+        }
     }
 
 
-    public function setActiveAction()
+    public function deleteUserAction()
     {
-        $setActive = false;
+        $id = getRequestId();
+        $result = $this->model->deleteUser($id);
 
-        if ($_POST['action'] === 'Set active') {
-            foreach ($_POST['id'] as $value) {
-                $setActive = $this->model->setActive($value);
-            }
-        } elseif ($_POST['action'] === 'Set not active') {
-            foreach ($_POST['id'] as $value) {
-                $setActive = $this->model->setNotActive($value);
-            }
-        } elseif ($_POST['action'] === 'Delete') {
-            foreach ($_POST['id'] as $value) {
-                $setActive = $this->model->deleteUsers($value);
-            }
-        } else return false;
-
-
-        if ($setActive) {
+        if ($result) {
             ApiResponse::response(200, []);
+        }
 
+        ApiResponse::response(404, [], 'User Not Found');
+    }
+
+    public function deleteUsersAction()
+    {
+        $params = getRequestData();
+        $result = null;
+
+        if (empty($params['ids'])) {
+            ApiResponse::response(417, [], 'Please provide users ids');
+        }
+        foreach ($params['ids'] as $id) {
+            $result = $this->model->deleteUser($id);
+        }
+
+        if ($result) {
+            ApiResponse::response(200, []);
+        }
+
+        ApiResponse::response(417, [], 'DB error');
+    }
+
+
+    public function changeStatusAction()
+    {
+        $result = $this->model->changeUserStatus();
+
+        if (empty($result['message'])) {
+            ApiResponse::response(200, $result);
         } else {
-            ApiResponse::response(417, [], 'form validation failed');
+            ApiResponse::response(417, [], $result['message']);
         }
 
     }
