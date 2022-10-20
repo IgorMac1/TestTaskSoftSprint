@@ -6,61 +6,133 @@ use core\Model;
 
 class User extends Model
 {
+    const ADMIN_ROLE_ID = 2;
+    const USER_ROLE_ID = 1;
 
-    public function addNewUser(array $data): void
+    protected $fillableFields = [
+        'name',
+        'surname',
+        'role_id',
+        'status'
+    ];
+
+    public function addNewUser()
     {
-        $registerDate = time();
+        $data = getRequestData();
         $params = [
-            'email' => htmlspecialchars(strtolower($data['email'])),
-            'login' => htmlspecialchars(strtolower($data['login'])),
-            'name' => htmlspecialchars(strtolower($data['name'])),
-            'pass' => htmlspecialchars(md5($data['pass'])),
-            'birthday' => htmlspecialchars(strtolower($data['birthday'])),
-            'country' => htmlspecialchars(strtolower($data['country'])),
-            'date' => $registerDate
+            'name' => htmlspecialchars(trim($data['name'])),
+            'surname' => htmlspecialchars(trim($data['surname'])),
+            'role_id' => in_array($data['role_id'], [self::ADMIN_ROLE_ID, self::USER_ROLE_ID]) ? $data['role_id'] : self::USER_ROLE_ID,
+            'status' => empty($data['status']) ? 'off' : htmlspecialchars($data['status']),
         ];
-        $this->db->query(
-            "INSERT INTO users (email,login,name,pass,birthday,country,date) VALUES (:email,:login,:name,:pass,:birthday,:country,:date)", $params
-        );
+        $result = $this->db->query("INSERT INTO users (name, surname, role_id, status) VALUES (:name, :surname, :role_id, :status)", $params);
+        if ($result) {
+            $newUserId = $this->db->getLastInsertId();
+            if ($newUserId) {
+                return $this->getUser($newUserId);
+            }
+        }
 
-        // return newly created row
-        return;
+        return null;
     }
 
-    public function getUser($email, $pass)
-    {
-        $params = [
-            'email' => htmlspecialchars(strtolower($email)),
-            'pass' => htmlspecialchars(md5($pass)),
-
-        ];
-        return $this->db->row("SELECT id, name, email FROM users WHERE email = :email AND pass = :pass OR login = :email AND pass = :pass", $params);
-    }
 
     public function getAllUsers()
     {
-        return  $this->db->getAllRows('SELECT * FROM users');
-//            $this->db->getAllRows('SELECT * FROM users');
-
+        return $this->db->getAllRows('SELECT users.id,
+                                                 users.name, 
+                                                 users.surname,
+                                                 CONCAT(users.name, " ", users.surname) full_name,
+                                                 status,
+                                                 role_id,
+                                                 roles.name role
+                                            FROM users
+                                       LEFT JOIN roles ON roles.id = users.role_id
+                                        ORDER BY users.id');
     }
 
-    public function checkUniqueEmail($email)
+    public function getUser($id)
     {
-        $params = [
-            'email' => strtolower($email),
-        ];
-
-        return $this->db->row("SELECT email FROM users WHERE email = :email ", $params);
+        return $this->db->row('SELECT users.id, 
+                                         users.name, 
+                                         users.surname,
+                                         CONCAT(users.name, " ", users.surname) full_name,
+                                         status,
+                                         role_id,
+                                         roles.name role
+                                    FROM users
+                               LEFT JOIN roles ON roles.id = users.role_id
+                                   WHERE users.id = :id', ['id' => $id]);
     }
 
-    public function checkUniqueLogin($login)
+    public function editUser()
     {
-        $params = [
-            'login' => strtolower($login),
-        ];
+        $id = getRequestId();
+        if ($id) {
+            $user = $this->getUser($id);
+            if (!$user) {
+                return null;
+            }
+        }
 
-        return $this->db->row("SELECT login FROM users WHERE login = :login ", $params);
+        $userData = getRequestData();
+        $updateFields = [];
+        $bindParams = [];
+
+        foreach ($userData as $key => $field) {
+            if (in_array($key, $this->fillableFields)) {
+                $updateFields[] = $key . ' = ' . ':' . $key;
+                $bindParams[$key] = $field;
+            }
+        }
+        $bindParams['id'] = $id;
+        $sql = "UPDATE users SET " . implode(',', $updateFields) . " WHERE id = :id";
+        $result = $this->db->query($sql, $bindParams);
+        if ($result) {
+            return $this->getUser($id);
+        }
+
+        return null;
     }
+
+
+    public function deleteUser($id)
+    {
+        if ($id) {
+            $user = $this->getUser($id);
+            if (!$user) {
+                return null;
+            }
+        }
+        return $this->db->query("DELETE FROM users WHERE id = :id ", ['id' => $id]);
+    }
+
+    public function changeUserStatus()
+    {
+        $postData = getRequestData();
+        $result = null;
+        if (empty($postData['status'])) {
+            return ['message' => 'Please provide correct status'];
+        }
+        if (empty($postData['ids'])) {
+            return ['message' => 'Please provide user ids'];
+        }
+
+        if ($postData['status'] === 'active') {
+            foreach ($postData['ids'] as $id) {
+                $result = $this->db->query("UPDATE users SET status = 'on' WHERE id = :id ", ['id' => $id]);
+            }
+        }
+
+        if ($postData['status'] === 'inactive') {
+            foreach ($postData['ids'] as $id) {
+                $result = $this->db->query("UPDATE users SET status = 'off' WHERE id = :id ", ['id' => $id]);
+            }
+        }
+
+        return $result ? ['message' => ''] : ['message' => 'DB error'];
+    }
+
 }
 
 

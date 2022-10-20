@@ -8,6 +8,9 @@ namespace lib;
 class Db
 {
     private static $instance = null;
+    /**
+     * @var \PDO
+     */
     private $db;
 
     private function __construct()
@@ -34,21 +37,25 @@ class Db
         return $this->db;
     }
 
-    public function query($sql,$params = [])
+    public function query($sql, $params = [])
     {
         $db = $this->getConnection();
 
-        $stmt = $db->prepare($sql);
-        if(!empty($params)){
-            foreach ($params as $key=>$value){
-                $stmt->bindValue(':'.$key,$value);
+        try {
+            $stmt = $db->prepare($sql);
+            if(!empty($params)){
+                foreach ($params as $key => $value){
+                    $stmt->bindValue(':'. $key, $value);
+                }
             }
+            $stmt->execute();
+            return $stmt;
+        } catch (\Exception $e) {
+            return null;
         }
-        $stmt->execute();
-        return $stmt;
     }
 
-    public function row($sql,$params = [])
+    public function row($sql, $params = [])
     {
         $result = $this->query($sql,$params);
         return $result->fetch(\PDO::FETCH_ASSOC);
@@ -56,7 +63,12 @@ class Db
 
     public function getAllRows($sql,$params = [])
     {
-        $result = $this->query($sql,$params);
+        $result = $this->query($sql, $params);
         return $result->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getLastInsertId()
+    {
+        return $this->db->lastInsertId();
     }
 }

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
           integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
 <body>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
@@ -27,25 +28,26 @@
                             <div class="row cols-row-lg-3 text-center">
                                 <div class="col ">
                                     <form>
-                                        <button type="button" class="btn btn-primary" data-target="#user-form-modal"
+                                        <button type="button" class="btn btn-primary addUser"
+                                                data-target="#user-form-modal"
                                                 data-toggle="modal">Add
                                         </button>
                                     </form>
                                 </div>
 
                                 <div class=" col ">
-                                    <form>
-                                        <select name="select" form="" class="custom-select">
-                                            <option>Please Select</option>
-                                            <option>Set active</option>
-                                            <option>Set not active</option>
-                                            <option>Delete</option>
-                                        </select>
+
+                                    <select name="select" class="custom-select select select-action top">
+                                        <option value="" disabled selected hidden>Please Select</option>
+                                        <option value="active">Set active</option>
+                                        <option value="inactive">Set not active</option>
+                                        <option value="delete">Delete</option>
+                                    </select>
                                 </div>
                                 <div class="col ">
 
-                                    <button type="button" class="btn btn-success">OK</button>
-                                    </form>
+                                    <button type="submit" class="btn btn-success ok top">OK</button>
+
                                 </div>
 
 
@@ -56,9 +58,8 @@
                                         <thead>
                                         <tr>
                                             <th class="align-top">
-                                                <div
-                                                        class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0">
-                                                    <input type="checkbox" class="custom-control-input" id="all-items">
+                                                <div class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0">
+                                                    <input type="checkbox" class="custom-control-input " id="all-items">
                                                     <label class="custom-control-label" for="all-items"></label>
                                                 </div>
                                             </th>
@@ -68,66 +69,69 @@
                                             <th>Actions</th>
                                         </tr>
                                         </thead>
-                                        <tbody>
+
+                                        <tbody id="table-users">
+
                                         <?php foreach ($users as $users): ?>
-                                            <tr>
-                                                <td class="align-middle">
-                                                    <div
-                                                            class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0 align-top">
-                                                        <input type="checkbox" class="custom-control-input"
+
+                                            <tr class="user" id="<?= $users['id'] ?>">
+                                                <td dataField="name" dataValue="<?= $users['name'] ?>" class="align-middle">
+                                                    <div class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0 align-top">
+                                                        <input type="checkbox" class="custom-control-input checkbox id td-checkbox"
+                                                               name="id" value="<?= $users['id'] ?>"
                                                                id="item-<?= $users['id'] ?>">
                                                         <label class="custom-control-label"
                                                                for="item-<?= $users['id'] ?>"></label>
                                                     </div>
                                                 </td>
-                                                <td class="text-nowrap align-middle"><?= ucfirst($users['name']) . ' ' . ucfirst($users['surname']) ?></td>
-                                                <td class="text-nowrap align-middle">
-                                                    <span><?php if ($users['is_admin'] == 2) {
-                                                            echo "Admin";
-                                                        } else echo "User" ?></span></td>
-                                                <td class="text-center align-middle"><i
-                                                            class="fa fa-circle active-circle"></i></td>
+                                                <td dataField="surname" dataValue="<?= $users['surname'] ?>" class="text-nowrap align-middle"><?= $users['full_name'] ?></td>
+                                                <td dataField="role_id" dataValue="<?= $users['role_id'] ?>" class="text-nowrap align-middle">
+                                                    <span><?= $users['role'] ?></span></td>
+                                                <td dataField="status" dataValue="<?= $users['status'] ?>" class="user-status text-center align-middle">
+                                                    <i class="fa fa-circle <?php echo $users['status'] ?>-circle"></i>
+                                                </td>
                                                 <td class="text-center align-middle">
                                                     <div class="btn-group align-top">
-                                                        <button class="btn btn-sm btn-outline-secondary badge"
-                                                                type="button" data-toggle="modal"
-                                                                data-target="#user-form-modal">Edit
+                                                        <button class="btn btn-sm btn-outline-secondary badge edit"
+                                                                type="submit"  data-target="#user-form-modal"
+                                                                data-toggle="modal" id="<?= $users['id'] ?>" >Edit
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-secondary badge"
+                                                        <button class="btn btn-sm btn-outline-secondary badge deleteUser "
                                                                 data-target="#user-delete-modal"
                                                                 data-toggle="modal"
-                                                                id="deleteUser<?= $users->id ?>"
-                                                                type="button"><i class="fa fa-trash"></i></button>
+                                                                id="<?= $users['id'] ?>"
+                                                                type="submit"><i class="fa fa-trash" ></i></button>
 
                                                     </div>
                                                 </td>
                                             </tr>
+
                                         <?php endforeach; ?>
                                         </tbody>
+
                                     </table>
                                 </div>
                             </div>
 
-
                             <div class="row cols-row-lg-3 text-center">
                                 <div class="col">
-                                    <form>
-                                        <button type="button" class="btn btn-primary" data-target="#user-form-modal"
+
+                                        <button type="button" class="btn btn-primary addUser" data-target="#user-form-modal"
                                                 data-toggle="modal">Add
                                         </button>
-                                    </form>
+
                                 </div>
                                 <div class=" col">
-                                    <select name="select" form="" class="custom-select">
-                                        <option>Please Select</option>
-                                        <option>Set active</option>
-                                        <option>Set not active</option>
-                                        <option>Delete</option>
+                                    <select name="select" form="" class="custom-select select-action bottom">
+                                        <option value="" disabled selected hidden>Please Select</option>
+                                        <option value="active">Set active</option>
+                                        <option value="inactive">Set not active</option>
+                                        <option value="delete">Delete</option>
                                     </select>
                                 </div>
                                 <div class="col">
                                     <form>
-                                        <button type="button" class="btn btn-success">OK</button>
+                                        <button type="button" class="btn btn-success ok bottom">OK</button>
                                     </form>
                                 </div>
 
@@ -145,7 +149,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="UserModalLabel">Add user</h5>
-                                <div id="errorMess" class="alert alert-danger" role="alert"></div>
+
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -161,11 +165,12 @@
                                     <input required type="text" class="form-control" id="last-name" name="surname">
                                 </div>
                                 <div class="custom-control custom-switch my-5">
-                                    <input type="checkbox" class="custom-control-input" id="customSwitch1" name="status">
-                                    <label class="custom-control-label" for="customSwitch1" >Active</label>
+                                    <input type="checkbox" class="custom-control-input" id="customSwitch1"
+                                           name="status">
+                                    <label class="custom-control-label" for="customSwitch1">Active</label>
                                 </div>
-                                <select class="custom-select" id="role" name="role">
-                                    <option selected>Role</option>
+                                <select class="custom-select" id="role" name="role_id">
+                                    <option value="" disabled selected hidden>Role</option>
                                     <option value="1">User</option>
                                     <option value="2">Admin</option>
                                 </select>
@@ -173,7 +178,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button id="addUserButton" type="submit" class="btn btn-primary" id="btn">Save</button>
+                                <button type="submit" class="btn btn-primary submit-button" >Save</button>
                             </div>
 
                         </div>
@@ -181,33 +186,39 @@
                 </div>
             </form>
 
-            <div class="modal fade" id="user-delete-modal" tabindex="-1" aria-labelledby="user-form-modal"
-                 aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-body">
-
-                            <h2>Are you sure you want to delete this user?</h2>
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button id="deleteUserButton" type="submit" class="btn btn-primary" id="btn">Delete</button>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
-    <script>
+
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#deleteModal" id="warningModal"
+            hidden>
+    </button>
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body warning" id="warning">
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="confirmDelete" hidden>Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
-
-    </script>
-    <script src="./js/addUser.js"></script>
+    <script src="./js/script.js"></script>
 
 </body>
 </html>
