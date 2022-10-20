@@ -19,5 +19,4 @@ class ApiResponse
         echo json_encode($response);
         die();
     }
-
 }

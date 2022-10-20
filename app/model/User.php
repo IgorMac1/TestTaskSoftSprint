@@ -20,8 +20,8 @@ class User extends Model
     {
         $data = getRequestData();
         $params = [
-            'name' => htmlspecialchars($data['name']),
-            'surname' => htmlspecialchars($data['surname']),
+            'name' => htmlspecialchars(trim($data['name'])),
+            'surname' => htmlspecialchars(trim($data['surname'])),
             'role_id' => in_array($data['role_id'], [self::ADMIN_ROLE_ID, self::USER_ROLE_ID]) ? $data['role_id'] : self::USER_ROLE_ID,
             'status' => empty($data['status']) ? 'off' : htmlspecialchars($data['status']),
         ];
@@ -35,6 +35,7 @@ class User extends Model
 
         return null;
     }
+
 
     public function getAllUsers()
     {
@@ -110,7 +111,6 @@ class User extends Model
     {
         $postData = getRequestData();
         $result = null;
-
         if (empty($postData['status'])) {
             return ['message' => 'Please provide correct status'];
         }

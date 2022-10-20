@@ -5,7 +5,6 @@ namespace app\controllers;
 use core\ApiResponse;
 use core\Controller;
 
-
 class UserController extends Controller
 {
     public function indexAction()
@@ -26,7 +25,6 @@ class UserController extends Controller
         }
     }
 
-
     public function editAction()
     {
         $user = $this->model->editUser();
@@ -37,7 +35,6 @@ class UserController extends Controller
             ApiResponse::response(404, [], 'User Not Found');
         }
     }
-
 
     public function deleteUserAction()
     {
@@ -70,7 +67,6 @@ class UserController extends Controller
         ApiResponse::response(417, [], 'DB error');
     }
 
-
     public function changeStatusAction()
     {
         $result = $this->model->changeUserStatus();
@@ -82,9 +78,6 @@ class UserController extends Controller
         }
 
     }
-
-
-
 }
 
 

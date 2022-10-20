@@ -5,10 +5,14 @@ $(function () {
         let formData = parseFormData($(this).serializeArray());
         event.preventDefault();
         if (!formData.role_id){
-            warningText.innerText = 'choose role';
-            document.getElementById('confirmDelete').hidden = true ;
-            document.getElementById('warningModal').click();
-            return false
+            modalWarning('Choose role');
+            return false;
+        }else if (formData.name.length < 3){
+            modalWarning('Name must be at least 3 symbols');
+            return false;
+        }else if (formData.surname.length < 5){
+            modalWarning('Surname must be at least 5 symbols');
+            return false;
         }
         let id = $('form#ajax_form .submit-button').attr('id');
         if (id) {
@@ -23,6 +27,7 @@ $(function () {
     function parseFormData(formData) {
         let userData = {};
         $.each(formData, function (i, field) {
+
             userData[field.name] = field.value;
         });
         if (!userData.status) {
@@ -39,6 +44,7 @@ $(function () {
                 $userRow = getUserRow(result.user);
                 $('#table-users').append($userRow);
                 initializeButtonAction();
+
             });
     }
 
@@ -68,10 +74,8 @@ $(function () {
         }
 
         if (checkboxes.length === 0) {
-            document.getElementById('confirmDelete').hidden = true ;
-            document.getElementById('warningModal').click();
-            warningText.innerText = 'choose users';
-            return;
+            modalWarning('Choose users');
+            return false;
         }
         switch (selectedAction) {
             case 'active':
@@ -84,10 +88,7 @@ $(function () {
                 break;
             }
             case null: {
-                warningText.innerText = 'choose action';
-                document.getElementById('confirmDelete').hidden = true ;
-                document.getElementById('warningModal').click();
-                console.log(warningText);
+                modalWarning('choose action');
                 break;
             }
         }
@@ -150,7 +151,7 @@ $(function () {
                 $('#deleteModal').modal('hide');
             })
         });
-        $('button.editUser').on('click',function () {
+        $('button.edit').on('click',function () {
             let id = $(this).attr('id');
             $('form#ajax_form .submit-button').attr('id', id);
             $('h5.modal-title').text('Edit User');
@@ -198,6 +199,7 @@ $(function () {
             }
         });
     }
+
     initializeButtonAction();
 
     function sendRequest(url, data, onSuccess, onError, method = 'POST') {
@@ -228,7 +230,7 @@ $(function () {
                            for="item-${userData.id}"></label>
                 </div>
             </td>
-            <td class="text-nowrap align-middle">${userData.name}</td>
+            <td class="text-nowrap align-middle">${userData.name + ' ' + userData.surname}</td>
             <td class="text-nowrap align-middle">
                 <span>${userData.role}</span></td>
             <td class="user-status text-center align-middle">
@@ -245,10 +247,14 @@ $(function () {
                             data-toggle="modal"
                             id="${userData.id}"
                             type="submit"><i class="fa fa-trash" ></i></button>
-
                 </div>
             </td>
         </tr>`
+    }
+    function modalWarning(text = '',confirmButton = true){
+        warningText.innerText = text;
+        document.getElementById('confirmDelete').hidden = confirmButton ;
+        document.getElementById('warningModal').click();
     }
 })
 

@@ -92,7 +92,7 @@
                                                 </td>
                                                 <td class="text-center align-middle">
                                                     <div class="btn-group align-top">
-                                                        <button class="btn btn-sm btn-outline-secondary badge editUser"
+                                                        <button class="btn btn-sm btn-outline-secondary badge edit"
                                                                 type="submit"  data-target="#user-form-modal"
                                                                 data-toggle="modal" id="<?= $users['id'] ?>" >Edit
                                                         </button>
@@ -115,11 +115,11 @@
 
                             <div class="row cols-row-lg-3 text-center">
                                 <div class="col">
-                                    <form>
-                                        <button type="button" class="btn btn-primary" data-target="#user-form-modal"
+
+                                        <button type="button" class="btn btn-primary addUser" data-target="#user-form-modal"
                                                 data-toggle="modal">Add
                                         </button>
-                                    </form>
+
                                 </div>
                                 <div class=" col">
                                     <select name="select" form="" class="custom-select select-action bottom">
@@ -218,7 +218,7 @@
 
 
 
-    <script src="./js/addUser.js"></script>
+    <script src="./js/script.js"></script>
 
 </body>
 </html>
