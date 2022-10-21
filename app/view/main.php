@@ -94,12 +94,12 @@
                                                     <div class="btn-group align-top">
                                                         <button class="btn btn-sm btn-outline-secondary badge edit"
                                                                 type="submit"  data-target="#user-form-modal"
-                                                                data-toggle="modal" id="<?= $users['id'] ?>" >Edit
+                                                                data-toggle="modal" id="edit-<?= $users['id'] ?>" >Edit
                                                         </button>
                                                         <button class="btn btn-sm btn-outline-secondary badge deleteUser "
                                                                 data-target="#user-delete-modal"
                                                                 data-toggle="modal"
-                                                                id="<?= $users['id'] ?>"
+                                                                id="delete-<?= $users['id'] ?>"
                                                                 type="submit"><i class="fa fa-trash" ></i></button>
 
                                                     </div>
@@ -210,7 +210,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="confirmDelete" hidden>Confirm</button>
+                    <button type="button" class="btn btn-primary confirmDelete"  hidden>Confirm</button>
                 </div>
             </div>
         </div>

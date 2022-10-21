@@ -1,17 +1,20 @@
 $(function () {
     const warningText = document.getElementById('warning');
 
+    let selectedIds;
+    let selectedDeleteId;
+
     $('form#ajax_form').submit(function (event) {
         let formData = parseFormData($(this).serializeArray());
         event.preventDefault();
         if (!formData.role_id){
             modalWarning('Choose role');
             return false;
-        }else if (formData.name.length < 3){
-            modalWarning('Name must be at least 3 symbols');
+        }else if (formData.name.length < 2 || formData.name.length > 50){
+            modalWarning('Name must be from 2 to 50 symbols');
             return false;
-        }else if (formData.surname.length < 5){
-            modalWarning('Surname must be at least 5 symbols');
+        }else if (formData.surname.length < 2 || formData.surname.length > 50){
+            modalWarning('Surname must be from 2 to 50 symbols');
             return false;
         }
         let id = $('form#ajax_form .submit-button').attr('id');
@@ -41,10 +44,8 @@ $(function () {
             '/api/users',
             userData,
             function (result) {
-                $userRow = getUserRow(result.user);
-                $('#table-users').append($userRow);
-                initializeButtonAction();
-
+                let userRow = getUserRow(result.user);
+                $('#table-users').append(userRow);
             });
     }
 
@@ -53,9 +54,8 @@ $(function () {
             '/api/users/' + userId,
             userData,
             function (result) {
-                $userRow = getUserRow(result.user);
-                $('tr#' + userId).replaceWith($userRow);
-                initializeButtonAction();
+                let userRow = getUserRow(result.user);
+                $('tr#' + userId).replaceWith(userRow);
             }, function () {
 
             }, 'PUT');
@@ -64,9 +64,10 @@ $(function () {
     $('button.ok').on('click',function (){
         let checkboxes = [];
         let userData = {};
-
         $('input:checkbox:checked').each(function(){
-            checkboxes.push(this.value);
+            if (this.value !== 'on'){
+                checkboxes.push(this.value);
+            }return true
         });
         let selectedAction = $('select.select-action.top').val();
         if ($(this).hasClass('bottom')) {
@@ -95,24 +96,14 @@ $(function () {
 
         function deleteUsers() {
             warningText.innerText = 'Are you sure you want to delete these users ?' ;
-            $('#confirmDelete').attr('hidden', false);
+            $('button.confirmDelete').attr('hidden', false);
             $('#warningModal').click();
+            selectedIds = checkboxes;
             $('button#confirmDelete').on('click',function (){
-                userData['ids'] = checkboxes;
-                sendRequest(
-                    '/api/users/delete',
-                    userData,
-                    function () {
-                        for (let id in checkboxes) {
-                            let userRow = $('tr#' + checkboxes[id]);
-                            userRow.remove();
-                        }
-                    },
-                    function () {
-                    },
-                    'DELETE');
+
                 $('#deleteModal').modal('hide');
             });
+
         }
         function setUserStatus (status) {
             userData['status'] = status;
@@ -128,31 +119,52 @@ $(function () {
                     }
                 },
                 function () {
-            });
+                });
         }
     })
 
+    $(document).on('click', 'button.confirmDelete', function () {
+        if (selectedDeleteId) {
+            sendRequest(
+                '/api/users/' + selectedDeleteId,
+                {},
+                function () {
+                    $('tr#' + selectedDeleteId).remove();
+                    selectedDeleteId = undefined;
+                },
+                function () {
+                },
+                'DELETE');
+        } else {
+            let requestData = {ids: selectedIds};
+            sendRequest(
+                '/api/users/delete',
+                requestData,
+                function () {
+                    for (let id in selectedIds) {
+                        let userRow = $('tr#' + selectedIds[id]);
+                        userRow.remove();
+                    }
+                    selectedIds = undefined;
+                },
+                function () {
+                },
+                'DELETE');
+        }
+
+        $('#deleteModal').modal('hide');
+    })
     function initializeButtonAction() {
-        $('button.deleteUser').on('click',function () {
+        $(document).on('click', 'button.deleteUser', function () {
+            setAllCheckboxesOff()
             warningText.innerText = 'Are you sure you want to delete this user ?' ;
-            $('#confirmDelete').attr('hidden', false);
+            $('button.confirmDelete').attr('hidden', false);
             $('#warningModal').click();
-            let userId = $(this).attr('id');
-            $('button#confirmDelete').on('click',function (){
-                sendRequest(
-                    '/api/users/' + userId,
-                    {},
-                    function () {
-                        $('tr#' + userId).remove();
-                    },
-                    function () {
-                    },
-                    'DELETE');
-                $('#deleteModal').modal('hide');
-            })
+            selectedDeleteId = $(this).attr('id').split(['-'])[1];
         });
-        $('button.edit').on('click',function () {
-            let id = $(this).attr('id');
+        $(document).on('click', 'button.edit', function () {
+            setAllCheckboxesOff()
+            let id = $(this).attr('id').split(['-'])[1];
             $('form#ajax_form .submit-button').attr('id', id);
             $('h5.modal-title').text('Edit User');
             $('tr#' + id).find('td').each(function () {
@@ -167,23 +179,22 @@ $(function () {
                 }
             });
         });
-        $('button.addUser').on('click',function () {
+        $(document).on('click', 'button.addUser', function () {
+            setAllCheckboxesOff()
             $('form#ajax_form .submit-button').attr('id', '');
             $('h5.modal-title').text('Add User');
             $('form#ajax_form')[0].reset();
         });
-        $('#all-items').on('change', function() {
+        $(document).on('click', '#all-items', function() {
             if(this.checked) {
-                $('.td-checkbox').each(function () {
-                    $(this).prop('checked', 'checked');
+                $(':checkbox').each(function() {
+                    this.checked = true;
                 });
             } else {
-                $('.td-checkbox').each(function () {
-                    $(this).prop('checked', false);
-                });
+                setAllCheckboxesOff()
             }
         });
-        $('.td-checkbox').on('change', function() {
+        $(document).on('click', '.td-checkbox', function() {
             if(!this.checked) {
                 $('#all-items').prop('checked', false);
             } else {
@@ -199,7 +210,6 @@ $(function () {
             }
         });
     }
-
     initializeButtonAction();
 
     function sendRequest(url, data, onSuccess, onError, method = 'POST') {
@@ -221,7 +231,7 @@ $(function () {
     function getUserRow(userData){
         return `
         <tr class="user" id="${userData.id}">
-            <td class="align-middle">
+            <td dataField="name" dataValue="${userData.name}" class="align-middle">
                 <div class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0 align-top">
                     <input type="checkbox" class="custom-control-input checkbox id"
                            name="id" value="${userData.id}"
@@ -230,31 +240,38 @@ $(function () {
                            for="item-${userData.id}"></label>
                 </div>
             </td>
-            <td class="text-nowrap align-middle">${userData.name + ' ' + userData.surname}</td>
-            <td class="text-nowrap align-middle">
+            <td dataField="surname" dataValue="${userData.surname}" class="text-nowrap align-middle">${userData.full_name}</td>
+            <td dataField="role_id" dataValue="${userData.role_id}" class="text-nowrap align-middle">
                 <span>${userData.role}</span></td>
-            <td class="user-status text-center align-middle">
+            <td dataField="status" dataValue="${userData.status}" class="user-status text-center align-middle">
                 <i class="fa fa-circle ${userData.status}-circle"></i>
             </td>
             <td class="text-center align-middle">
                 <div class="btn-group align-top">
                     <button class="btn btn-sm btn-outline-secondary badge edit"
                             type="submit" data-toggle="modal"
-                            data-target="#user-form-modal" id="${userData.id}" >Edit
+                            data-target="#user-form-modal" id="edit-${userData.id}" >Edit
                     </button>
                     <button class="btn btn-sm btn-outline-secondary badge deleteUser "
                             data-target="#user-delete-modal"
                             data-toggle="modal"
-                            id="${userData.id}"
+                            id="delete-${userData.id}"
                             type="submit"><i class="fa fa-trash" ></i></button>
                 </div>
             </td>
         </tr>`
     }
+
     function modalWarning(text = '',confirmButton = true){
         warningText.innerText = text;
-        document.getElementById('confirmDelete').hidden = confirmButton ;
+        document.getElementsByClassName('confirmDelete').hidden = confirmButton ;
         document.getElementById('warningModal').click();
+    }
+
+    function setAllCheckboxesOff(){
+        $(':checkbox').each(function() {
+            this.checked = false;
+        });
     }
 })
 

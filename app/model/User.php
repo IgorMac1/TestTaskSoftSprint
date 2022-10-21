@@ -25,6 +25,11 @@ class User extends Model
             'role_id' => in_array($data['role_id'], [self::ADMIN_ROLE_ID, self::USER_ROLE_ID]) ? $data['role_id'] : self::USER_ROLE_ID,
             'status' => empty($data['status']) ? 'off' : htmlspecialchars($data['status']),
         ];
+        if (strlen($params['name']) < 2 || strlen($params['name']) > 50){
+            return false;
+        }elseif (strlen($params['surname']) < 2 || strlen($params['surname']) > 50) {
+            return false;
+        }
         $result = $this->db->query("INSERT INTO users (name, surname, role_id, status) VALUES (:name, :surname, :role_id, :status)", $params);
         if ($result) {
             $newUserId = $this->db->getLastInsertId();
@@ -32,10 +37,8 @@ class User extends Model
                 return $this->getUser($newUserId);
             }
         }
-
         return null;
     }
-
 
     public function getAllUsers()
     {
@@ -68,6 +71,7 @@ class User extends Model
     public function editUser()
     {
         $id = getRequestId();
+        dd($id);
         if ($id) {
             $user = $this->getUser($id);
             if (!$user) {

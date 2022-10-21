@@ -27,6 +27,7 @@ class UserController extends Controller
 
     public function editAction()
     {
+
         $user = $this->model->editUser();
 
         if ($user) {
@@ -38,11 +39,14 @@ class UserController extends Controller
 
     public function deleteUserAction()
     {
+
         $id = getRequestId();
+        $user = $this->model->getUser($id);
         $result = $this->model->deleteUser($id);
 
+
         if ($result) {
-            ApiResponse::response(200, []);
+            ApiResponse::response(200, ['user' => $user]);
         }
 
         ApiResponse::response(404, [], 'User Not Found');
@@ -52,16 +56,18 @@ class UserController extends Controller
     {
         $params = getRequestData();
         $result = null;
-
+        $user = [];
         if (empty($params['ids'])) {
             ApiResponse::response(417, [], 'Please provide users ids');
         }
         foreach ($params['ids'] as $id) {
+            $user[] = $this->model->getUser($id);
             $result = $this->model->deleteUser($id);
+
         }
 
         if ($result) {
-            ApiResponse::response(200, []);
+            ApiResponse::response(200, ['users' => $user]);
         }
 
         ApiResponse::response(417, [], 'DB error');
