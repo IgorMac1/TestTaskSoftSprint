@@ -71,7 +71,6 @@ class User extends Model
     public function editUser()
     {
         $id = getRequestId();
-        dd($id);
         if ($id) {
             $user = $this->getUser($id);
             if (!$user) {
