@@ -82,10 +82,12 @@ $(function () {
             case 'active':
             case 'inactive': {
                 setUserStatus(selectedAction);
+                setAllCheckboxesOff();
                 break;
             }
             case 'delete': {
                 deleteUsers();
+                setAllCheckboxesOff();
                 break;
             }
             case null: {
