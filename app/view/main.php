@@ -37,9 +37,9 @@
 
                                 <div class=" col ">
 
-                                    <select name="select" class="custom-select select select-action top">
-                                        <option value="" disabled selected hidden>Please Select</option>
-                                        <option value="active">Set active</option>
+                                    <select name="select" class="custom-select select select-action top" >
+                                        <option value=""  disabled selected  id="please-select">Please Select</option>
+                                        <option value="active" >Set active</option>
                                         <option value="inactive">Set not active</option>
                                         <option value="delete">Delete</option>
                                     </select>
@@ -123,7 +123,7 @@
                                 </div>
                                 <div class=" col">
                                     <select name="select" form="" class="custom-select select-action bottom">
-                                        <option value="" disabled selected hidden>Please Select</option>
+                                        <option value="" disabled selected >Please Select</option>
                                         <option value="active">Set active</option>
                                         <option value="inactive">Set not active</option>
                                         <option value="delete">Delete</option>
@@ -157,10 +157,12 @@
                             <div class="modal-body">
 
                                 <div class="form-group">
+                                    <h6 class="warning" id="warning-name" hidden >Name must be from 2 to 50 symbols</h6>
                                     <label for="first-name" class="col-form-label ">First Name:</label>
                                     <input required type="text" class="form-control" id="first-name" name="name">
                                 </div>
                                 <div class="form-group">
+                                    <h6 class="warning" id="warning-surname" hidden >Last Name must be from 2 to 50 symbols</h6>
                                     <label for="last-name" class="col-form-label">Last Name:</label>
                                     <input required type="text" class="form-control" id="last-name" name="surname">
                                 </div>
@@ -169,15 +171,16 @@
                                            name="status">
                                     <label class="custom-control-label" for="customSwitch1">Active</label>
                                 </div>
+                                <h6 class="warning" id="warning-role" hidden >Choose role</h6>
                                 <select class="custom-select" id="role" name="role_id">
-                                    <option value="" disabled selected hidden>Role</option>
+                                    <option value="" disabled selected >Role</option>
                                     <option value="1">User</option>
                                     <option value="2">Admin</option>
                                 </select>
 
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" id="close-button-add-user" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                 <button type="submit" class="btn btn-primary submit-button" >Save</button>
                             </div>
 
@@ -219,6 +222,16 @@
 
 
     <script src="./js/script.js"></script>
+
+
+
+
+    <select  >
+        <option >Please Select</option>
+        <option >Set active</option>
+        <option >Set not active</option>
+        <option >Delete</option>
+    </select>
 
 </body>
 </html>

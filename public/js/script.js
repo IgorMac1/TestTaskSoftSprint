@@ -8,13 +8,13 @@ $(function () {
         let formData = parseFormData($(this).serializeArray());
         event.preventDefault();
         if (!formData.role_id){
-            modalWarning('Choose role');
+            $('h6#warning-role').attr('hidden', false);
             return false;
         }else if (formData.name.length < 2 || formData.name.length > 50){
-            modalWarning('Name must be from 2 to 50 symbols');
+            $('h6#warning-name').attr('hidden', false);
             return false;
         }else if (formData.surname.length < 2 || formData.surname.length > 50){
-            modalWarning('Surname must be from 2 to 50 symbols');
+            $('h6#warning-surname').attr('hidden', false);
             return false;
         }
         let id = $('form#ajax_form .submit-button').attr('id');
@@ -23,9 +23,9 @@ $(function () {
         } else {
             addUser(formData);
         }
-
         $('#user-form-modal').modal('hide')
     });
+
 
     function parseFormData(formData) {
         let userData = {};
@@ -78,6 +78,7 @@ $(function () {
             modalWarning('Choose users');
             return false;
         }
+        // setAllCheckboxesOff();
         switch (selectedAction) {
             case 'active':
             case 'inactive': {
@@ -91,7 +92,7 @@ $(function () {
                 break;
             }
             case null: {
-                modalWarning('choose action');
+                modalWarning('Choose action');
                 break;
             }
         }
@@ -165,6 +166,9 @@ $(function () {
             selectedDeleteId = $(this).attr('id').split(['-'])[1];
         });
         $(document).on('click', 'button.edit', function () {
+            $('h6#warning-name').attr('hidden', true);
+            $('h6#warning-surname').attr('hidden', true);
+            $('h6#warning-role').attr('hidden', true);
             setAllCheckboxesOff()
             let id = $(this).attr('id').split(['-'])[1];
             $('form#ajax_form .submit-button').attr('id', id);
@@ -183,6 +187,9 @@ $(function () {
         });
         $(document).on('click', 'button.addUser', function () {
             setAllCheckboxesOff()
+            $('h6#warning-name').attr('hidden', true);
+            $('h6#warning-surname').attr('hidden', true);
+            $('h6#warning-role').attr('hidden', true);
             $('form#ajax_form .submit-button').attr('id', '');
             $('h5.modal-title').text('Add User');
             $('form#ajax_form')[0].reset();
