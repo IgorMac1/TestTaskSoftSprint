@@ -183,7 +183,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" id="close-button-add-user" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary submit-button" >Save</button>
+                                <button type="submit" class="btn btn-primary submit-button" id="btn-save">Save</button>
                             </div>
 
                         </div>

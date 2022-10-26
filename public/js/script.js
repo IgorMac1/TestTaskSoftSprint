@@ -57,6 +57,7 @@ $(function () {
                 $('tr#' + userId).replaceWith(userRow);
             }, function () {
                 $('h6#warning-user-not-found').attr('hidden', false);
+                $('.submit-button').attr('disabled',true)
             }, 'PUT');
     }
 
@@ -121,6 +122,7 @@ $(function () {
     })
 
     $(document).on('click', 'button.confirmDelete', function () {
+        $('h6#warning-user-not-found').attr('hidden', true);
         if (selectedDeleteId) {
             sendRequest(
                 '/api/users/' + selectedDeleteId,
@@ -130,6 +132,8 @@ $(function () {
                     selectedDeleteId = undefined;
                 },
                 function () {
+                    warningText.innerText = 'User not found' ;
+                    $('.confirmDelete').attr('disabled',true);
                 },
                 'DELETE');
         } else {
@@ -152,6 +156,7 @@ $(function () {
     })
     function initializeButtonAction() {
         $(document).on('click', 'button.deleteUser', function () {
+            $('.confirmDelete').attr('disabled',false)
             setAllCheckboxesOff()
             warningText.innerText = 'Are you sure you want to delete this user ?' ;
             $('button.confirmDelete').attr('hidden', false);
@@ -159,6 +164,7 @@ $(function () {
             selectedDeleteId = $(this).attr('id').split(['-'])[1];
         });
         $(document).on('click', 'button.edit', function () {
+            $('.submit-button').attr('disabled',false);
             $('h6#warning-user-not-found').attr('hidden', true);
             $('h6#warning-name').attr('hidden', true);
             $('h6#warning-surname').attr('hidden', true);
@@ -180,6 +186,7 @@ $(function () {
             });
         });
         $(document).on('click', 'button.addUser', function () {
+            $('.submit-button').attr('disabled',false);
             setAllCheckboxesOff()
             $('h6#warning-user-not-found').attr('hidden', true);
             $('h6#warning-name').attr('hidden', true);
