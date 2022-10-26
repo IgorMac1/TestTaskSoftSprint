@@ -12,5 +12,9 @@ h6.warning {
   color: red;
 }
 
+h6#warning-user-not-found{
+  margin-left: 5em;
+}
+
 
 

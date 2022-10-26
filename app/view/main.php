@@ -149,7 +149,8 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="UserModalLabel">Add user</h5>
-                                <h6 class="warning" id="warning-user-not-found" hidden >User not found</h6>
+
+                                <h6 class="warning " id="warning-user-not-found">User not found</h6>
 
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
