@@ -149,7 +149,7 @@ $(function () {
                     selectedIds = undefined;
                 },
                 function () {
-                },
+                    },
                 'DELETE');
         }
 
@@ -160,6 +160,7 @@ $(function () {
             setAllCheckboxesOff()
             warningText.innerText = 'Are you sure you want to delete this user ?' ;
             $('button.confirmDelete').attr('hidden', false);
+            $('h5.modal-title').text('');
             $('#warningModal').click();
             selectedDeleteId = $(this).attr('id').split(['-'])[1];
         });
