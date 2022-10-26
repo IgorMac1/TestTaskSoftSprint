@@ -149,6 +149,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="UserModalLabel">Add user</h5>
+                                <h6 class="warning" id="warning-user-not-found" hidden >User not found</h6>
 
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
@@ -218,20 +219,6 @@
             </div>
         </div>
     </div>
-
-
-
     <script src="./js/script.js"></script>
-
-
-
-
-    <select  >
-        <option >Please Select</option>
-        <option >Set active</option>
-        <option >Set not active</option>
-        <option >Delete</option>
-    </select>
-
 </body>
 </html>

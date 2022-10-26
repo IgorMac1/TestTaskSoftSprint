@@ -114,11 +114,11 @@ class User extends Model
     {
         $postData = getRequestData();
         $result = null;
-        if (empty($postData['status'])) {
-            return ['message' => 'Please provide correct status'];
-        }
-        if (empty($postData['ids'])) {
-            return ['message' => 'Please provide user ids'];
+        foreach ($postData['ids'] as $id){
+            $user = $this->getUser($id);
+            if (!$user){
+                return null;
+            }
         }
 
         if ($postData['status'] === 'active') {
@@ -133,7 +133,7 @@ class User extends Model
             }
         }
 
-        return $result ? ['message' => ''] : ['message' => 'DB error'];
+      return $result;
     }
 
 }

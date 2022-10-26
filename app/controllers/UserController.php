@@ -44,12 +44,11 @@ class UserController extends Controller
         $user = $this->model->getUser($id);
         $result = $this->model->deleteUser($id);
 
-
         if ($result) {
             ApiResponse::response(200, ['user' => $user]);
+        }else{
+            ApiResponse::response(404, [], 'User Not Found');
         }
-
-        ApiResponse::response(404, [], 'User Not Found');
     }
 
     public function deleteUsersAction()
@@ -68,21 +67,27 @@ class UserController extends Controller
 
         if ($result) {
             ApiResponse::response(200, ['users' => $user]);
+        }else{
+            ApiResponse::response(404, [], 'User Not Found');
         }
-
-        ApiResponse::response(417, [], 'DB error');
     }
 
     public function changeStatusAction()
     {
-        $result = $this->model->changeUserStatus();
-
-        if (empty($result['message'])) {
-            ApiResponse::response(200, $result);
-        } else {
-            ApiResponse::response(417, [], $result['message']);
+        $params = getRequestData();
+        $user = [];
+        foreach ($params['ids'] as $id) {
+            $user[] = $this->model->getUser($id);
         }
 
+        $result = $this->model->changeUserStatus();
+
+
+        if ($result) {
+            ApiResponse::response(200, ['users' => $user]);
+        } else {
+            ApiResponse::response(404, [], 'User Not Found');
+        }
     }
 }
 

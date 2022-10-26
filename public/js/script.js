@@ -23,9 +23,8 @@ $(function () {
         } else {
             addUser(formData);
         }
-        $('#user-form-modal').modal('hide')
-    });
 
+    });
 
     function parseFormData(formData) {
         let userData = {};
@@ -57,7 +56,7 @@ $(function () {
                 let userRow = getUserRow(result.user);
                 $('tr#' + userId).replaceWith(userRow);
             }, function () {
-
+                $('h6#warning-user-not-found').attr('hidden', false);
             }, 'PUT');
     }
 
@@ -78,7 +77,6 @@ $(function () {
             modalWarning('Choose users');
             return false;
         }
-        // setAllCheckboxesOff();
         switch (selectedAction) {
             case 'active':
             case 'inactive': {
@@ -102,11 +100,6 @@ $(function () {
             $('button.confirmDelete').attr('hidden', false);
             $('#warningModal').click();
             selectedIds = checkboxes;
-            $('button#confirmDelete').on('click',function (){
-
-                $('#deleteModal').modal('hide');
-            });
-
         }
         function setUserStatus (status) {
             userData['status'] = status;
@@ -122,6 +115,7 @@ $(function () {
                     }
                 },
                 function () {
+                    modalWarning('User not found');
                 });
         }
     })
@@ -155,7 +149,6 @@ $(function () {
                 'DELETE');
         }
 
-        $('#deleteModal').modal('hide');
     })
     function initializeButtonAction() {
         $(document).on('click', 'button.deleteUser', function () {
@@ -166,6 +159,7 @@ $(function () {
             selectedDeleteId = $(this).attr('id').split(['-'])[1];
         });
         $(document).on('click', 'button.edit', function () {
+            $('h6#warning-user-not-found').attr('hidden', true);
             $('h6#warning-name').attr('hidden', true);
             $('h6#warning-surname').attr('hidden', true);
             $('h6#warning-role').attr('hidden', true);
@@ -187,6 +181,7 @@ $(function () {
         });
         $(document).on('click', 'button.addUser', function () {
             setAllCheckboxesOff()
+            $('h6#warning-user-not-found').attr('hidden', true);
             $('h6#warning-name').attr('hidden', true);
             $('h6#warning-surname').attr('hidden', true);
             $('h6#warning-role').attr('hidden', true);
@@ -227,6 +222,8 @@ $(function () {
             type: method,
             data: data,
             success: function (result) {
+                $('#user-form-modal').modal('hide')
+                $('#deleteModal').modal('hide');
                 onSuccess(result);
             },
             error: function (result) {
@@ -272,6 +269,7 @@ $(function () {
     }
 
     function modalWarning(text = '',confirmButton = true){
+        $('h5.modal-title').text('');
         warningText.innerText = text;
         document.getElementsByClassName('confirmDelete').hidden = confirmButton ;
         document.getElementById('warningModal').click();
