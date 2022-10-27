@@ -88,6 +88,7 @@ $(function () {
             case 'delete': {
                 deleteUsers();
                 setAllCheckboxesOff();
+                $('.confirmDelete').attr('disabled',false);
                 break;
             }
             case null: {
@@ -117,6 +118,7 @@ $(function () {
                 },
                 function () {
                     modalWarning('User not found');
+                    $('button.confirmDelete').attr('hidden', true);
                 });
         }
     })
@@ -149,6 +151,8 @@ $(function () {
                     selectedIds = undefined;
                 },
                 function () {
+                    warningText.innerText = 'User not found' ;
+                    $('.confirmDelete').attr('disabled',true);
                     },
                 'DELETE');
         }
@@ -160,7 +164,6 @@ $(function () {
             setAllCheckboxesOff()
             warningText.innerText = 'Are you sure you want to delete this user ?' ;
             $('button.confirmDelete').attr('hidden', false);
-            $('h5.modal-title').text('');
             $('#warningModal').click();
             selectedDeleteId = $(this).attr('id').split(['-'])[1];
         });
@@ -277,7 +280,6 @@ $(function () {
     }
 
     function modalWarning(text = '',confirmButton = true){
-        $('h5.modal-title').text('');
         warningText.innerText = text;
         document.getElementsByClassName('confirmDelete').hidden = confirmButton ;
         document.getElementById('warningModal').click();
