@@ -29,7 +29,6 @@ $(function () {
     function parseFormData(formData) {
         let userData = {};
         $.each(formData, function (i, field) {
-
             userData[field.name] = field.value;
         });
         if (!userData.status) {
@@ -45,6 +44,7 @@ $(function () {
             function (result) {
                 let userRow = getUserRow(result.user);
                 $('#table-users').append(userRow);
+                $('#user-form-modal').modal('hide');
             });
     }
 
@@ -53,11 +53,16 @@ $(function () {
             '/api/users/' + userId,
             userData,
             function (result) {
+                if (result.error!== null && result.error.message === 'User Not Found'){
+                    $('h6#warning-user-not-found').attr('hidden', false);
+                    $('.submit-button').attr('disabled',true)
+                    return false
+                }
+                $('#user-form-modal').modal('hide')
                 let userRow = getUserRow(result.user);
                 $('tr#' + userId).replaceWith(userRow);
             }, function () {
-                $('h6#warning-user-not-found').attr('hidden', false);
-                $('.submit-button').attr('disabled',true)
+
             }, 'PUT');
     }
 
@@ -98,27 +103,37 @@ $(function () {
         }
 
         function deleteUsers() {
-            warningText.innerText = 'Are you sure you want to delete these users ?' ;
-            $('button.confirmDelete').attr('hidden', false);
-            $('#warningModal').click();
             selectedIds = checkboxes;
+            let userNames = [];
+            for (let i in selectedIds) {
+                userNames.push($('.user#' + selectedIds[i] + ' td[dataField="surname"]').text());
+            }
+            $('#warningModal').click();
+            $('button.confirmDelete').attr('hidden', false);
+            warningText.innerText = 'Are you sure you want to delete these users?' + "\n" + userNames.join("\n");
         }
+
         function setUserStatus (status) {
             userData['status'] = status;
             userData['ids'] = checkboxes;
             sendRequest(
                 '/api/users/change-status',
                 userData,
-                function () {
+                function (result) {
+                    if (result.user === false){
+                        modalWarning('Users : ' + "\n" + userNotFound(result).join("\n") + "\n" + ' not found');
+                        $('button.confirmDelete').attr('hidden', true);
+                        return false;
+                    }
                     let userIconStatus = status === 'active' ? 'on' : 'off';
                     for (let id in checkboxes) {
                         let statusBlock = $('tr#' + checkboxes[id] + ' td.user-status');
+                        statusBlock.attr('dataValue',userIconStatus)
                         statusBlock.empty().append('<i class="fa fa-circle ' + userIconStatus + '-circle"></i>');
                     }
                 },
                 function () {
-                    modalWarning('User not found');
-                    $('button.confirmDelete').attr('hidden', true);
+
                 });
         }
     })
@@ -129,13 +144,22 @@ $(function () {
             sendRequest(
                 '/api/users/' + selectedDeleteId,
                 {},
+                function (result) {
+
+                    if (result.user === false){
+                        warningText.innerText = 'User ' + userNotFound(result) + ' not found' ;
+                        $('.confirmDelete').attr('disabled',true);
+                        $('tr#' + selectedDeleteId).remove();
+                        selectedDeleteId = undefined;
+
+                    }else if (result.user !== false){
+                        $('#deleteModal').modal('hide');
+                        $('tr#' + selectedDeleteId).remove();
+                        selectedDeleteId = undefined;
+                    }
+                    },
                 function () {
-                    $('tr#' + selectedDeleteId).remove();
-                    selectedDeleteId = undefined;
-                },
-                function () {
-                    warningText.innerText = 'User not found' ;
-                    $('.confirmDelete').attr('disabled',true);
+
                 },
                 'DELETE');
         } else {
@@ -143,17 +167,27 @@ $(function () {
             sendRequest(
                 '/api/users/delete',
                 requestData,
-                function () {
-                    for (let id in selectedIds) {
-                        let userRow = $('tr#' + selectedIds[id]);
-                        userRow.remove();
+                function (result) {
+                    if (result.user === false){
+                        warningText.innerText = 'Users : ' + "\n" + userNotFound(result).join("\n") + "\n" + ' not found' ;
+                        $('.confirmDelete').attr('disabled',true);
+                        for (let id in selectedIds) {
+                            let userRow = $('tr#' + selectedIds[id]);
+                            userRow.remove();
+                        }
+
+                    }else if (result.user !== false){
+                        for (let id in selectedIds) {
+                            let userRow = $('tr#' + selectedIds[id]);
+                            userRow.remove();
+                        }
+                        $('#deleteModal').modal('hide');
+                        selectedIds = undefined;
                     }
-                    selectedIds = undefined;
-                },
-                function () {
-                    warningText.innerText = 'User not found' ;
-                    $('.confirmDelete').attr('disabled',true);
                     },
+                function () {
+
+                },
                 'DELETE');
         }
 
@@ -162,10 +196,13 @@ $(function () {
         $(document).on('click', 'button.deleteUser', function () {
             $('.confirmDelete').attr('disabled',false)
             setAllCheckboxesOff()
-            warningText.innerText = 'Are you sure you want to delete this user ?' ;
+            selectedDeleteId = $(this).attr('id').split(['-'])[1];
+            let userName = $('.user#' + selectedDeleteId + ' td[dataField="surname"]').text();
+            warningText.innerText = 'Are you sure you want to delete this user: ' + userName + ' ?' ;
             $('button.confirmDelete').attr('hidden', false);
             $('#warningModal').click();
-            selectedDeleteId = $(this).attr('id').split(['-'])[1];
+
+
         });
         $(document).on('click', 'button.edit', function () {
             $('.submit-button').attr('disabled',false);
@@ -233,8 +270,6 @@ $(function () {
             type: method,
             data: data,
             success: function (result) {
-                $('#user-form-modal').modal('hide')
-                $('#deleteModal').modal('hide');
                 onSuccess(result);
             },
             error: function (result) {
@@ -250,7 +285,7 @@ $(function () {
         <tr class="user" id="${userData.id}">
             <td dataField="name" dataValue="${userData.name}" class="align-middle">
                 <div class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0 align-top">
-                    <input type="checkbox" class="custom-control-input checkbox id"
+                    <input type="checkbox" class="custom-control-input checkbox id td-checkbox"
                            name="id" value="${userData.id}"
                            id="item-${userData.id}">
                     <label class="custom-control-label"
@@ -289,6 +324,22 @@ $(function () {
         $(':checkbox').each(function() {
             this.checked = false;
         });
+    }
+
+    function userNotFound(result){
+        let usersId = result.notFoundId
+        let userNames = [];
+        if (usersId.length > 0){
+            for(let i in usersId){
+                $('.user').each(function (){
+                    if (usersId[i] === $(this).attr('id')){
+                        userNames.push($('.user#' + usersId[i] + ' td[dataField="surname"]').text());
+                    }
+                })
+
+            }
+        }
+        return userNames
     }
 })
 

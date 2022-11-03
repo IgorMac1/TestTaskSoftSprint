@@ -59,7 +59,7 @@
                                         <tr>
                                             <th class="align-top">
                                                 <div class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0">
-                                                    <input type="checkbox" class="custom-control-input " id="all-items">
+                                                    <input type="checkbox" class="custom-control-input " id="all-items" >
                                                     <label class="custom-control-label" for="all-items"></label>
                                                 </div>
                                             </th>
@@ -84,7 +84,7 @@
                                                                for="item-<?= $users['id'] ?>"></label>
                                                     </div>
                                                 </td>
-                                                <td dataField="surname" dataValue="<?= $users['surname'] ?>" class="text-nowrap align-middle"><?= $users['full_name'] ?></td>
+                                                <td dataField="surname" dataValue="<?= $users['surname'] ?>" class="text-nowrap align-middle" ><?= $users['full_name'] ?></td>
                                                 <td dataField="role_id" dataValue="<?= $users['role_id'] ?>" class="text-nowrap align-middle">
                                                     <span><?= $users['role'] ?></span></td>
                                                 <td dataField="status" dataValue="<?= $users['status'] ?>" class="user-status text-center align-middle">
@@ -150,7 +150,7 @@
                             <div class="modal-header">
                                 <h5 class="modal-title" id="UserModalLabel">Add user</h5>
 
-                                <h6 class="warning " id="warning-user-not-found">User not found</h6>
+
 
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
@@ -182,6 +182,7 @@
 
                             </div>
                             <div class="modal-footer">
+                                <h6 class="warning " id="warning-user-not-found">User not found</h6>
                                 <button type="button" id="close-button-add-user" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                 <button type="submit" class="btn btn-primary submit-button" id="btn-save">Save</button>
                             </div>
