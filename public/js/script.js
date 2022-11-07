@@ -25,7 +25,6 @@ $(function () {
         }
 
     });
-
     function parseFormData(formData) {
         let userData = {};
         $.each(formData, function (i, field) {
@@ -38,10 +37,12 @@ $(function () {
     }
 
     function addUser(userData) {
+        console.log(userData)
         sendRequest(
             '/api/users',
             userData,
             function (result) {
+                setAllCheckboxesOff();
                 let userRow = getUserRow(result.user);
                 $('#table-users').append(userRow);
                 $('#user-form-modal').modal('hide');
@@ -53,7 +54,8 @@ $(function () {
             '/api/users/' + userId,
             userData,
             function (result) {
-                if (result.error!== null && result.error.message === 'User Not Found'){
+                setAllCheckboxesOff();
+                if (result.status === false){
                     $('h6#warning-user-not-found').attr('hidden', false);
                     $('.submit-button').attr('disabled',true)
                     return false
@@ -92,7 +94,6 @@ $(function () {
             }
             case 'delete': {
                 deleteUsers();
-                setAllCheckboxesOff();
                 $('.confirmDelete').attr('disabled',false);
                 break;
             }
@@ -120,7 +121,7 @@ $(function () {
                 '/api/users/change-status',
                 userData,
                 function (result) {
-                    if (result.user === false){
+                    if (result.status === false){
                         modalWarning('Users : ' + "\n" + userNotFound(result).join("\n") + "\n" + ' not found');
                         $('button.confirmDelete').attr('hidden', true);
                         return false;
@@ -139,15 +140,16 @@ $(function () {
     })
 
     $(document).on('click', 'button.confirmDelete', function () {
+        setAllCheckboxesOff();
         $('h6#warning-user-not-found').attr('hidden', true);
         if (selectedDeleteId) {
             sendRequest(
                 '/api/users/' + selectedDeleteId,
                 {},
                 function (result) {
-
-                    if (result.user === false){
-                        warningText.innerText = 'User ' + userNotFound(result) + ' not found' ;
+                    if (result.status === false){
+                        let userName = $('.user#' + selectedDeleteId + ' td[dataField="surname"]').text();
+                        warningText.innerText = 'User ' + userName + ' not found' ;
                         $('.confirmDelete').attr('disabled',true);
                         $('tr#' + selectedDeleteId).remove();
                         selectedDeleteId = undefined;
@@ -168,7 +170,7 @@ $(function () {
                 '/api/users/delete',
                 requestData,
                 function (result) {
-                    if (result.user === false){
+                    if (result.status === false){
                         warningText.innerText = 'Users : ' + "\n" + userNotFound(result).join("\n") + "\n" + ' not found' ;
                         $('.confirmDelete').attr('disabled',true);
                         for (let id in selectedIds) {
@@ -176,7 +178,7 @@ $(function () {
                             userRow.remove();
                         }
 
-                    }else if (result.user !== false){
+                    }else if (result.status !== false){
                         for (let id in selectedIds) {
                             let userRow = $('tr#' + selectedIds[id]);
                             userRow.remove();
@@ -195,7 +197,6 @@ $(function () {
     function initializeButtonAction() {
         $(document).on('click', 'button.deleteUser', function () {
             $('.confirmDelete').attr('disabled',false)
-            setAllCheckboxesOff()
             selectedDeleteId = $(this).attr('id').split(['-'])[1];
             let userName = $('.user#' + selectedDeleteId + ' td[dataField="surname"]').text();
             warningText.innerText = 'Are you sure you want to delete this user: ' + userName + ' ?' ;
@@ -210,7 +211,6 @@ $(function () {
             $('h6#warning-name').attr('hidden', true);
             $('h6#warning-surname').attr('hidden', true);
             $('h6#warning-role').attr('hidden', true);
-            setAllCheckboxesOff()
             let id = $(this).attr('id').split(['-'])[1];
             $('form#ajax_form .submit-button').attr('id', id);
             $('h5.modal-title').text('Edit User');
@@ -228,7 +228,6 @@ $(function () {
         });
         $(document).on('click', 'button.addUser', function () {
             $('.submit-button').attr('disabled',false);
-            setAllCheckboxesOff()
             $('h6#warning-user-not-found').attr('hidden', true);
             $('h6#warning-name').attr('hidden', true);
             $('h6#warning-surname').attr('hidden', true);

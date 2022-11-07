@@ -169,8 +169,7 @@
                                     <input required type="text" class="form-control" id="last-name" name="surname">
                                 </div>
                                 <div class="custom-control custom-switch my-5">
-                                    <input type="checkbox" class="custom-control-input" id="customSwitch1"
-                                           name="status">
+                                    <input type="checkbox" class="custom-control-input" id="customSwitch1" name="status">
                                     <label class="custom-control-label" for="customSwitch1">Active</label>
                                 </div>
                                 <h6 class="warning" id="warning-role" hidden >Choose role</h6>

@@ -16,10 +16,11 @@ class UserController extends Controller
 
     public function addAction()
     {
+
         $newUser = $this->model->addNewUser();
 
         if ($newUser) {
-            ApiResponse::response(200, ['user' => $newUser]);
+            ApiResponse::response(200,true, ['user' => $newUser]);
         } else {
             ApiResponse::response(417, [], 'DB error');
         }
@@ -28,13 +29,12 @@ class UserController extends Controller
     public function editAction()
     {
         $user = $this->model->editUser();
-        $id = getRequestId();
         if ($user) {
-            ApiResponse::response(200, ['user' => $user]);
+            ApiResponse::response(200,true, ['user' => $user]);
         } elseif ($user === null) {
-            ApiResponse::response(200, [], 'User Not Found',false,$id);
+            ApiResponse::response(200,false, ['user' => null], 'User not found');
         }else{
-            ApiResponse::response(417, [], 'DB error');
+            ApiResponse::response(417,false, [], 'DB error');
         }
     }
 
@@ -45,12 +45,12 @@ class UserController extends Controller
         $result = $this->model->deleteUser($id);
         $userNotFoundId = [];
         if ($result) {
-            ApiResponse::response(200, ['user' => $user]);
+            ApiResponse::response(200,true, ['user' => $user]);
         }elseif ($result === null){
             $userNotFoundId[] = $id;
-            ApiResponse::response(200, [], 'User Not Found',false,$userNotFoundId);
+            ApiResponse::response(200,false, ['user' => null], 'User not found');
         }else{
-            ApiResponse::response(417, [], 'DB error');
+            ApiResponse::response(417,false, [], 'DB error');
         }
     }
 
@@ -64,22 +64,25 @@ class UserController extends Controller
         $userNotFoundId = [];
 
         if (empty($params['ids'])) {
-            ApiResponse::response(417, [], 'Please provide users ids');
+            ApiResponse::response(417,false, ['user' => null], 'Please provide users ids');
         }
         foreach ($params['ids'] as $id) {
-            $user[] = $this->model->getUser($id);
+
             if (!$this->model->getUser($id)){
+                $user[] = [$id => null];
                 $userNotFoundId[] = $id;
+            }elseif($this->model->getUser($id)){
+                $user[] = $this->model->getUser($id);
             }
             $result = $this->model->deleteUser($id);
         }
 
         if (!empty($userNotFoundId)){
-            ApiResponse::response(200, ['users' => $user], "User(s) Not Found",false,$userNotFoundId);
+            ApiResponse::response(200,false, ['users' => $user], "User(s) not found",$userNotFoundId);
         }elseif ($result){
-            ApiResponse::response(200, ['users' => $user]);
+            ApiResponse::response(200,true, ['users' => $user]);
         }else {
-            ApiResponse::response(417, [], 'DB error');
+            ApiResponse::response(417,false, [], 'DB error');
         }
     }
 
@@ -91,18 +94,21 @@ class UserController extends Controller
         $result = $this->model->changeUserStatus();
         foreach ($params['ids'] as $id) {
             if (!$this->model->getUser($id)){
+                $user[] = [$id => null];
                 $userNotFoundId[]= $id;
+            }elseif($this->model->getUser($id)){
+                $user[] = $this->model->getUser($id);
             }
-            $user[] = $this->model->getUser($id);
+
         }
 
 
         if (!empty($userNotFoundId)){
-            ApiResponse::response(200, ['users' => $user], "User(s) Not Found",false,$userNotFoundId);
+            ApiResponse::response(200,false, ['users' => $user], "User(s) not found",$userNotFoundId);
         }elseif ($result){
-            ApiResponse::response(200, ['users' => $user]);
+            ApiResponse::response(200,true, ['users' => $user]);
         }else {
-            ApiResponse::response(417, [], 'DB error');
+            ApiResponse::response(417,false, [], 'DB error');
         }
     }
 }
