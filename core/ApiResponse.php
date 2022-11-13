@@ -4,22 +4,23 @@ namespace core;
 
 class ApiResponse
 {
-    public static function response($statusCode, $status, $responseData, $errorMessage = null, $userNotFoundId = [])
+    public static function response($httpStatusCode, $status, $responseData,$errorCode = null,$errorMessage = null, $userNotFoundId = [])
     {
         header('Content-Type: application/json; charset=utf-8');
-        http_response_code($statusCode);
+
+        http_response_code($httpStatusCode);
+
+        $error = $errorMessage ? ['code' => $errorCode, 'message' => $errorMessage] : null;
 
         if (empty($userNotFoundId)) {
             $response = array_merge([
-                'code' => $statusCode,
                 'status' => $status,
-                'error' => $errorMessage
+                'error' => $error
             ], $responseData);
         } else {
             $response = array_merge([
-                'code' => $statusCode,
                 'status' => $status,
-                'error' => $errorMessage,
+                'error' => $error,
                 'notFoundId' => $userNotFoundId
             ], $responseData);
         }
