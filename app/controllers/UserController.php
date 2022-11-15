@@ -32,7 +32,7 @@ class UserController extends Controller
         if ($user) {
             ApiResponse::response(200,true, ['user' => $user]);
         } elseif ($user === null) {
-            ApiResponse::response(100,false, ['user' => null], 'not found user');
+            ApiResponse::response(200,false, ['user' => null], 100,'not found user');
         }else{
             ApiResponse::response(417,false, [], 417,'DB error');
         }
