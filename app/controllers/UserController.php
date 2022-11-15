@@ -20,7 +20,7 @@ class UserController extends Controller
         $newUser = $this->model->addNewUser();
 
         if ($newUser) {
-            ApiResponse::response(200,true, ['user' => $newUser]);
+            ApiResponse::response(200, true, ['user' => $newUser]);
         } else {
             ApiResponse::response(417, [], 'DB error');
         }
@@ -30,11 +30,11 @@ class UserController extends Controller
     {
         $user = $this->model->editUser();
         if ($user) {
-            ApiResponse::response(200,true, ['user' => $user]);
+            ApiResponse::response(200, true, ['user' => $user]);
         } elseif ($user === null) {
-            ApiResponse::response(200,false, ['user' => null], 100,'not found user');
-        }else{
-            ApiResponse::response(417,false, [], 417,'DB error');
+            ApiResponse::response(200, false, ['user' => null], 100, 'not found user');
+        } else {
+            ApiResponse::response(417, false, [], 417, 'DB error');
         }
     }
 
@@ -44,43 +44,41 @@ class UserController extends Controller
         $user = $this->model->getUser($id);
         $result = $this->model->deleteUser($id);
         if ($result) {
-            ApiResponse::response(200,true, ['user' => $user]);
-        }elseif ($result === null){
-            ApiResponse::response(200,false, ['user' => null],100,'not found user');
-        }else{
-            ApiResponse::response(417,false, [], 417,'DB error');
+            ApiResponse::response(200, true, ['user' => $user]);
+        } elseif ($result === null) {
+            ApiResponse::response(200, false, ['user' => null], 100, 'not found user');
+        } else {
+            ApiResponse::response(417, false, [], 417, 'DB error');
         }
     }
 
     public function deleteUsersAction()
     {
         $params = getRequestData();
-
         $result = null;
         $user = [];
-
         $userNotFoundId = [];
 
         if (empty($params['ids'])) {
-            ApiResponse::response(417,false, ['user' => null], 417,'Please provide users ids');
+            ApiResponse::response(417, false, ['user' => null], 417, 'Please provide users ids');
         }
-        foreach ($params['ids'] as $id) {
 
-            if (!$this->model->getUser($id)){
+        foreach ($params['ids'] as $id) {
+            if (!$this->model->getUser($id)) {
                 $user[] = [$id => null];
                 $userNotFoundId[] = $id;
-            }elseif($this->model->getUser($id)){
+            } elseif ($this->model->getUser($id)) {
                 $user[] = $this->model->getUser($id);
             }
             $result = $this->model->deleteUser($id);
         }
 
-        if (!empty($userNotFoundId)){
-            ApiResponse::response(200,false, ['users' => $user],100, "not found user",$userNotFoundId);
-        }elseif ($result){
-            ApiResponse::response(200,true,['users' => $user]);
-        }else {
-            ApiResponse::response(417,false, [],417, 'DB error');
+        if (!empty($userNotFoundId)) {
+            ApiResponse::response(200, false, ['users' => $user], 100, "not found user", $userNotFoundId);
+        } elseif ($result) {
+            ApiResponse::response(200, true, ['users' => $user]);
+        } else {
+            ApiResponse::response(417, false, [], 417, 'DB error');
         }
     }
 
@@ -91,19 +89,19 @@ class UserController extends Controller
         $user = [];
         $result = $this->model->changeUserStatus();
         foreach ($params['ids'] as $id) {
-            if (!$this->model->getUser($id)){
+            if (!$this->model->getUser($id)) {
                 $user[] = [$id => null];
-                $userNotFoundId[]= $id;
-            }elseif($this->model->getUser($id)){
+                $userNotFoundId[] = $id;
+            } elseif ($this->model->getUser($id)) {
                 $user[] = $this->model->getUser($id);
             }
         }
-        if (!empty($userNotFoundId)){
-            ApiResponse::response(200,false, ['users' => $user], 100,"not found user",$userNotFoundId);
-        }elseif ($result){
-            ApiResponse::response(200,true, ['users' => $user]);
-        }else {
-            ApiResponse::response(417,false, [],417, 'DB error');
+        if (!empty($userNotFoundId)) {
+            ApiResponse::response(200, false, ['users' => $user], 100, "not found user", $userNotFoundId);
+        } elseif ($result) {
+            ApiResponse::response(200, true, ['users' => $user]);
+        } else {
+            ApiResponse::response(417, false, [], 417, 'DB error');
         }
     }
 }

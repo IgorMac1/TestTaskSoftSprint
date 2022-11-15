@@ -94,7 +94,6 @@ class User extends Model
         if ($result) {
             return $this->getUser($id);
         }
-
         return null;
     }
 

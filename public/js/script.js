@@ -1,6 +1,5 @@
 $(function () {
     const warningText = document.getElementById('warning');
-
     let selectedIds;
     let selectedDeleteId;
 
@@ -23,7 +22,6 @@ $(function () {
         } else {
             addUser(formData);
         }
-
     });
     function parseFormData(formData) {
         let userData = {};
@@ -80,7 +78,6 @@ $(function () {
         if ($(this).hasClass('bottom')) {
             selectedAction = $('select.select-action.bottom').val();
         }
-
         if (checkboxes.length === 0) {
             modalWarning('Choose users');
             return false;
@@ -161,8 +158,7 @@ $(function () {
                     }
                     },
                 function () {
-
-                },
+                    },
                 'DELETE');
         } else {
             let requestData = {ids: selectedIds};
@@ -177,7 +173,6 @@ $(function () {
                             let userRow = $('tr#' + selectedIds[id]);
                             userRow.remove();
                         }
-
                     }else if (result.status !== false){
                         for (let id in selectedIds) {
                             let userRow = $('tr#' + selectedIds[id]);
@@ -194,6 +189,7 @@ $(function () {
         }
 
     })
+
     function initializeButtonAction() {
         $(document).on('click', 'button.deleteUser', function () {
             $('.confirmDelete').attr('disabled',false)
@@ -202,8 +198,6 @@ $(function () {
             warningText.innerText = 'Are you sure you want to delete this user: ' + userName + ' ?' ;
             $('button.confirmDelete').attr('hidden', false);
             $('#warningModal').click();
-
-
         });
         $(document).on('click', 'button.edit', function () {
             $('.submit-button').attr('disabled',false);
@@ -335,7 +329,6 @@ $(function () {
                         userNames.push($('.user#' + usersId[i] + ' td[dataField="surname"]').text());
                     }
                 })
-
             }
         }
         return userNames

@@ -6,7 +6,6 @@ class View
 {
     public $path;
     public $route;
-//    public $layout = 'default';
 
     public function __construct($route)
     {
@@ -18,11 +17,7 @@ class View
     {
         extract($vars);
         if (file_exists('app/view/' . $template . '.php')) {
-//            ob_start();
             require 'app/view/' . $template . '.php';
-//            $content = ob_get_clean();
-
-//            require 'app/view/main/' . $this->layout . '.php';
         } else {
             echo 'view not found';
         }

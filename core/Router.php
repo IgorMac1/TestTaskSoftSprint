@@ -53,11 +53,8 @@ class Router
                 if (method_exists($path, $action)) {
                     $controller = new $path($this->params);
                     $controller->$action();
-                    return;
                 }
             }
         }
-
-//        header('Location: /') ;
     }
 }

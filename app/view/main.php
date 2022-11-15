@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
           integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.1/dist/js/bootstrap.bundle.min.js"></script>
-
 </head>
 <body>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
@@ -24,7 +23,6 @@
                             <div class="card-title">
                                 <h6 class="mr-2 text-center"><span>Users</span></h6>
                             </div>
-
                             <div class="row cols-row-lg-3 text-center">
                                 <div class="col ">
                                     <form>
@@ -34,9 +32,7 @@
                                         </button>
                                     </form>
                                 </div>
-
                                 <div class=" col ">
-
                                     <select name="select" class="custom-select select select-action top" >
                                         <option value=""  disabled selected  id="please-select">Please Select</option>
                                         <option value="active" >Set active</option>
@@ -45,12 +41,8 @@
                                     </select>
                                 </div>
                                 <div class="col ">
-
                                     <button type="submit" class="btn btn-success ok top">OK</button>
-
                                 </div>
-
-
                             </div>
                             <div class="e-table">
                                 <div class="table-responsive table-lg mt-3">
@@ -69,11 +61,8 @@
                                             <th>Actions</th>
                                         </tr>
                                         </thead>
-
                                         <tbody id="table-users">
-
                                         <?php foreach ($users as $users): ?>
-
                                             <tr class="user" id="<?= $users['id'] ?>">
                                                 <td dataField="name" dataValue="<?= $users['name'] ?>" class="align-middle">
                                                     <div class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0 align-top">
@@ -101,25 +90,19 @@
                                                                 data-toggle="modal"
                                                                 id="delete-<?= $users['id'] ?>"
                                                                 type="submit"><i class="fa fa-trash" ></i></button>
-
                                                     </div>
                                                 </td>
                                             </tr>
-
                                         <?php endforeach; ?>
                                         </tbody>
-
                                     </table>
                                 </div>
                             </div>
-
                             <div class="row cols-row-lg-3 text-center">
                                 <div class="col">
-
-                                        <button type="button" class="btn btn-primary addUser" data-target="#user-form-modal"
+                                    <button type="button" class="btn btn-primary addUser" data-target="#user-form-modal"
                                                 data-toggle="modal">Add
-                                        </button>
-
+                                    </button>
                                 </div>
                                 <div class=" col">
                                     <select name="select" form="" class="custom-select select-action bottom">
@@ -149,15 +132,11 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="UserModalLabel">Add user</h5>
-
-
-
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div class="modal-body">
-
                                 <div class="form-group">
                                     <h6 class="warning" id="warning-name" hidden >Name must be from 2 to 50 symbols</h6>
                                     <label for="first-name" class="col-form-label ">First Name:</label>
@@ -193,8 +172,6 @@
 
         </div>
     </div>
-
-
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#deleteModal" id="warningModal"
             hidden>
@@ -210,9 +187,7 @@
                     </button>
                 </div>
                 <div class="modal-body warning" id="warning">
-
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary confirmDelete"  hidden>Confirm</button>
